@@ -1,0 +1,84 @@
+#!/bin/bash
+#
+# Robin Moser, 2019
+#
+# Mattermost REST Api Abfrage, um Namen von  ungelesene Channels auszugeben
+# Wird verwendet, um Tmux Panel-Farben sowie Raspberry Pi LEDs zu steuern
+# Sollte dauerhaft im Hintergrund laufen (wird gestartet über das Skript tmuxalert.sh)
+
+# Mattermostcredentials
+mattermostcredentials="/media/.credentials.mattermost"
+
+# Speichert Usermail und Passwort
+# Datei benötigt folgendes Format:
+# usermail=user@mail.com
+# userpass=password123!
+
+usermail=$(grep "$mattermostcredentials" -e usermail | sed 's/.*=//')
+userpass=$(grep "$mattermostcredentials" -e userpass | sed 's/.*=//')
+
+api="https://mattermost.gitlab.holzmann-medien.local/api/v4"
+user="users/sxez3m1g5pg6fdbjnwbncgjgpe" # UserID moser
+iisteam="teams/nrma3j4j1bnabp8tekneyto59c" # TeamID IIS
+
+tokenfile="/tmp/.mattermost.session.token"
+tmpfile="/tmp/.mattermost.unread.jsons"
+
+main() {
+	while true; do
+		gettoken
+		getchannellist
+		getunread
+		updatefile
+		sleep 15
+	done
+}
+
+gettoken() {
+	local login
+
+	if [ -f "$tokenfile" ]; then
+		if curl --fail -H "Authorization: Bearer $(cat "$tokenfile")" \
+		https://mattermost.gitlab.holzmann-medien.local/api/v4/users/me -o /dev/null -s; then
+			token=$(cat "$tokenfile")
+			return 0
+		fi
+	fi
+	login=$(curl -s -D - -o /dev/null \
+		-d "{\"login_id\":\"$usermail\",\"password\":\"$userpass\"}" \
+		$api/users/login )
+	token=$(echo "$login" | grep token | awk '{print $2}' )
+	token=${token//[$'\t\r\n ']}
+	echo "$token" > "$tokenfile"
+}
+
+getchannellist() {
+	local channels_members_url
+
+	channels_members_url="$api/$user/$iisteam/channels/members"
+	channels_members_json=$(curl -s -H "Authorization: Bearer $token" "$channels_members_url")
+
+	list=$(echo "$channels_members_json" | jq -r .[].channel_id)
+}
+
+getunread() {
+	local unread_url
+	local unread_json
+
+	: > $tmpfile.tmp
+
+	for l in $list; do
+		unread_url="$api/$user/channels/$l/unread"
+		unread_json=$(curl -s -H "Authorization: Bearer $token" "$unread_url")
+		if [[ ! "$unread_json" =~ "error" ]]; then
+			echo "$unread_json" | jq -rc 'del(.team_id)' >> "$tmpfile.tmp"
+		fi
+	done
+}
+
+updatefile() {
+	jq -s . "$tmpfile.tmp" > "$tmpfile"
+}
+
+main
+exit 0

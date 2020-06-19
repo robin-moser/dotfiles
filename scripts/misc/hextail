@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# $1: buffsize
+# $2: xxd-columns-width
+# $3: sleepVal
+#
+# defaults: 256 16 0
+
+size=${1:-256}
+cols=${2:-16}
+cnt=0
+hbuff=$(eval printf '00%.0s' "{1..$size}")
+while true; do
+    hbuff=${hbuff:2}$(dd bs=1 count=1 2>/dev/null | xxd -p)   # shiftLeft, add 1b
+    printf '\033[;H'; xxd -r -p <<<"$hbuff" | xxd -g1 -c$cols # cursor gotoxy 1,1
+    echo total bytes: $((++cnt)) ;   [ -z "$3" ] || sleep "$3"    # buff show.
+done

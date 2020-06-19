@@ -1,0 +1,21 @@
+#!/bin/bash
+#
+# Robin Moser, 2018
+#
+# Depricated!
+
+logfile="/home/moser/log/mattermost.log"
+tmplog="/home/moser/log/mattermost.temp.log"
+interface="org.freedesktop.Notifications"
+
+dbus-monitor "interface='$interface'" |
+  while read -r line; do
+      msg=$(echo $line | grep "string \"" | sed -e 's/string \"\(.*\)\"/\1/g')
+      if [ -n "$msg" ] && [[ ${msg:0:1} == "@" ]]; then
+        log=$(date +"[%m-%d %H:%M:%S]")" $msg"
+        out="\033[38;5;130m$(date +"[%m-%d %H:%M:%S]")\033[0m $msg"
+        echo "$log" >> $logfile
+        echo "$log" >> $tmplog
+        echo -e "$out"
+      fi
+  done
