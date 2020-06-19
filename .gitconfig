@@ -1,0 +1,25 @@
+[user]
+	name = Robin Moser
+	email = robin.moser@holzmann-medien.de
+
+[push]
+	default = simple
+
+[core]
+	pager = less -x1,3
+
+[url "https://"]
+	insteadOf = git://
+
+[include]
+	path = ~/.gitalias
+
+[credential]
+	helper = cache --timeout=900
+
+[color "diff"]
+	plain = dim
+	frag = cyan
+	func = dim
+	frag = cyan
+	meta = white
