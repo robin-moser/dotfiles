@@ -266,6 +266,8 @@ noremap Y "+y
 noremap <Leader>p "+p
 noremap <Leader>P "+P
 
+inoremap jk <ESC>
+
 " natural indenting (normal/visual)
 noremap > <<
 noremap < >>
