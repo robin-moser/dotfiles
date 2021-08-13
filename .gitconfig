@@ -23,3 +23,5 @@
 	func = dim
 	frag = cyan
 	meta = white
+[pull]
+	rebase = true

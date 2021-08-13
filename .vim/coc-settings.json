@@ -1,25 +1,70 @@
 {
-    "languageserver": {
-        "ccls": {
-            "command": "ccls",
-            "filetypes": [
-                "c",
-                "cpp",
-                "objc",
-                "objcpp"
-            ],
-            "rootPatterns": [
-                "compile_commands.json",
-                ".ccls",
-                ".vim/",
-                ".git/",
-                ".hg/"
-            ],
-            "initializationOptions": {
-                "cache": {
-                    "directory": "/tmp/ccls"
-                }
-            }
-        }
+
+  "coc.preferences.hoverTarget": "float",
+  "coc.preferences.formatOnSaveFiletypes": [
+    "css",
+    "scss",
+    "go"
+  ],
+
+
+  "go.goplsOptions": {
+    "staticcheck": true
+  },
+
+  "languageserver": {
+
+    "dockerfile": {
+      "command": "docker-langserver",
+      "filetypes": ["dockerfile"],
+      "args": ["--stdio"]
+    },
+
+    "intelephense": {
+      "command": "intelephense",
+      "args": ["--stdio"],
+      "filetypes": ["php"],
+      "initializationOptions": {
+        "storagePath": "/tmp/intelephense"
+      }
+    },
+
+    "golang": {
+      "command": "gopls",
+      "rootPatterns": ["go.mod"],
+      "disableWorkspaceFolders": true,
+      "filetypes": ["go"]
     }
+
+  },
+
+
+  "diagnostic-languageserver.mergeConfig": true,
+  "diagnostic-languageserver.linters": {
+    "shellcheck": {
+      "args": [
+        "--format", "json1",
+        "-o", "check-unassigned-uppercase", "-"
+      ],
+      "parseJson": {
+        "errorsRoot": "comments"
+      }
+    }
+  },
+
+  "diagnostic-languageserver.filetypes": {
+    "sh": "shellcheck"
+  },
+
+  "diagnostic-languageserver.formatFiletypes": {
+    "sh": "shfmt"
+  },
+
+  "diagnostic-languageserver.formatters": {
+    "shfmt": {
+      "command": "shfmt",
+      "args": ["-i", "2", "-bn", "-ci", "-sr"]
+    }
+  }
+
 }

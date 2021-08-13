@@ -49,6 +49,7 @@ set breakindent
 set number
 set updatetime=40
 set mouse=a
+set ttymouse=xterm2
 set nofixendofline
 
 set list
@@ -72,10 +73,10 @@ highlight  Statement                  ctermfg=214
 highlight  Visual                     ctermbg=237
 highlight  Search                     ctermfg=15     ctermbg=23
 
-highlight  DiffAdd                    ctermfg=40     ctermbg=none  gui=none  guifg=bg  guibg=Red
-highlight  DiffDelete                 ctermfg=88     ctermbg=none  gui=none  guifg=bg  guibg=Red
-highlight  DiffChange                 ctermfg=240    ctermbg=none  gui=none  guifg=bg  guibg=Red
-highlight  DiffText                   ctermfg=255    ctermbg=none  gui=none  guifg=bg  guibg=Red
+highlight  DiffAdd                    ctermfg=40     ctermbg=none
+highlight  DiffDelete                 ctermfg=88     ctermbg=none
+highlight  DiffChange                 ctermfg=240    ctermbg=none
+highlight  DiffText                   ctermfg=255    ctermbg=none
 
 highlight  Pmenu                      ctermfg=254    ctermbg=238
 highlight  VertSplit                  ctermfg=238    ctermbg=59
@@ -94,6 +95,15 @@ highlight  SpecialKey                 ctermfg=240
 
 highlight CocErrorFloat               ctermfg=196
 highlight CursorColumn                ctermbg=236
+
+highlight Tabline                     ctermbg=36
+highlight TablineSel                  ctermbg=240
+highlight TablineFill                 ctermfg=238
+
+highlight ToolbarButton               ctermbg=236
+highlight ToolbarLine                 ctermbg=238
+
+highlight EasyMotionMoveHL            ctermbg=none ctermfg=40 cterm=bold
 
 map <F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'
 \ . synIDattr(synID(line("."),col("."),0),"name") . "> lo<"
@@ -128,23 +138,44 @@ Plug 'tpope/vim-surround'
 Plug 'scrooloose/nerdtree'
 Plug 'easymotion/vim-easymotion'
 Plug 'airblade/vim-gitgutter'
+Plug 'tpope/vim-fugitive'
 Plug 'tomtom/tcomment_vim'
 Plug 'ntpeters/vim-better-whitespace'
 
 Plug 'roryokane/detectindent'
 Plug 'editorconfig/editorconfig-vim'
 
-Plug 'neoclide/coc.nvim'
-Plug 'scrooloose/syntastic'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
+Plug 'antoinemadec/coc-fzf'
+
+Plug 'puremourning/vimspector'
+Plug 'szw/vim-maximizer'
 
 Plug 'terryma/vim-multiple-cursors'
 
 call plug#end()
 
+" fzf
+""""""""""""""""
+nnoremap <leader><space> :Files<CR>
+nnoremap <leader>fg :GFiles<CR>
+nnoremap <leader>fh :History:<CR>
+nnoremap <leader>fr :Rg<CR>
+nnoremap <leader>fb :Buffers<CR>
+
+let g:fzf_action = {
+  \ 'ctrl-t': 'tab split',
+  \ 'ctrl-s': 'split',
+  \ 'ctrl-d': 'vsplit'
+  \ }
+
 " indentline
 """"""""""""""""
+
+let g:vim_json_conceal=0
+
 let g:indentLine_showFirstIndentLevel = 1
 let g:indentLine_leadingSpaceEnabled = 1
 let g:indentLine_color_term = 239
@@ -217,7 +248,8 @@ let g:netrw_altv = 1
 let g:NERDSpaceDelims = 1
 let g:NERDCompactSexyComs = 1
 let g:NERDDefaultAlign = 'left'
-let g:NERDTreeHijackNetrw = 0
+
+let g:NERDTreeHijackNetrw = 1
 
 let g:NERDTreeMinimalUI = 1
 let g:NERDTreeDirArrows = 1
@@ -244,6 +276,39 @@ map <Leader>k <Plug>(easymotion-k)
 
 vmap * y<Plug>(easymotion-sn)<C-R>"
 nmap * lbvey<Plug>(easymotion-sn)<C-R>"
+
+" vimspector
+""""""""""""""""
+fun! GotoWindow(id)
+    call win_gotoid(a:id)
+    MaximizerToggle
+endfun
+
+nnoremap <leader>m :MaximizerToggle!<CR>
+nnoremap <leader>dd :call vimspector#Launch()<CR>
+nnoremap <leader>dc :call GotoWindow(g:vimspector_session_windows.code)<CR>
+nnoremap <leader>dt :call GotoWindow(g:vimspector_session_windows.tagpage)<CR>
+nnoremap <leader>dv :call GotoWindow(g:vimspector_session_windows.variables)<CR>
+nnoremap <leader>dw :call GotoWindow(g:vimspector_session_windows.watches)<CR>
+nnoremap <leader>ds :call GotoWindow(g:vimspector_session_windows.stack_trace)<CR>
+nnoremap <leader>do :call GotoWindow(g:vimspector_session_windows.output)<CR>
+nnoremap <leader>de :call vimspector#Reset()<CR>
+
+nnoremap <leader>dtcb :call vimspector#CleanLineBreakpoint()<CR>
+
+nmap <leader>dl <Plug>VimspectorStepInto
+nmap <leader>dj <Plug>VimspectorStepOver
+nmap <leader>dk <Plug>VimspectorStepOut
+nmap <leader>dR <Plug>VimspectorRestart
+nnoremap <leader>d<space> :call vimspector#Continue()<CR>
+
+nmap <leader>drc <Plug>VimspectorRunToCursor
+nmap <leader>dbp <Plug>VimspectorToggleBreakpoint
+nmap <leader>dcbp <Plug>VimspectorToggleConditionalBreakpoint
+
+" <Plug>VimspectorStop
+" <Plug>VimspectorPause
+" <Plug>VimspectorAddFunctionBreakpoint
 
 """"""""""""""""""""""""""""""""""""""""""""""
 "   Custom Keybindings

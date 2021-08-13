@@ -23,13 +23,16 @@ alias dotconfig="/usr/bin/git --git-dir=\$HOME/.dotfiles/ --work-tree=\$HOME"
 
 # open programs
 alias fn='nautilus --browser . &>/dev/null &'
+alias fd='fdfind'
 alias br='google-chrome'
 alias sb='subl .'
 alias g='git'
+alias dce='iis_dockerexec'
 
 # file managers and editors
 alias vv='nnn -d'
-alias v='f -e vim'
+alias v='vim $(fzf)'
+alias c='cd "$(fdfind --type d | fzf)"'
 
 alias zz='selectpathtogo'
 alias h='formhistory'
@@ -195,4 +198,4 @@ ff () { /usr/bin/find . -iname "$*" ; }          # ff:       Find file under the
 ffs () { /usr/bin/find . -iname "$*"'*' ; }      # ffs:      Find file whose name starts with a given string
 ffe () { /usr/bin/find . -iname '*'"$*" ; }      # ffe:      Find file whose name ends with a given string
 ffc () { /usr/bin/find . -iname '*'"$*"'*' ; }   # ffc:      Find file whose name contains a given string
-fft () { grep -rn . -e "$@" ; }                  # fft:      Find text in all files recursive
+fft () { grep --color=always -rn . -e "$@" ; }                  # fft:      Find text in all files recursive

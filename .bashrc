@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# If not running interactively, don't do anything
+[ -z "$PS1" ] && return
+
 # change prompt
 #   username (orange)
 #   colon (white)
@@ -74,7 +77,7 @@ s:-_git status"
 # fzf set options
 export FZF_DEFAULT_OPTS="--extended --ansi"
 export FZF_CTRL_T_OPTS="$FZF_DEFAULT_OPS"
-export FZF_DEFAULT_COMMAND="fd --type f --color always"
+export FZF_DEFAULT_COMMAND="fdfind --type f --color always"
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 # set node version manager options
