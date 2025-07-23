@@ -1,0 +1,71 @@
+# Styling
+# -------------------------------
+
+adjust-cursor-thickness = 100%
+cursor-opacity = 0.8
+cursor-style = bar
+
+mouse-hide-while-typing = true
+
+window-padding-x = 6
+window-padding-balance = true
+window-padding-color = extend
+
+macos-titlebar-style = hidden
+window-decoration = none
+title = Ghostty
+
+window-theme = light
+theme = OneHalfLight
+
+background = 31323C
+foreground = B5BBC1
+
+macos-non-native-fullscreen = true
+window-height = 40
+window-width = 160
+
+window-save-state = never
+window-position-x = 203
+window-position-y = 190
+
+font-size = 13.5
+font-family = JetBrains Mono
+font-feature = calt,cv10,cv12
+font-style-bold = ExtraBold
+
+# Behavior
+# -------------------------------
+
+link-url = true
+confirm-close-surface = false
+
+keybind = cmd+t=toggle_quick_terminal
+keybind = cmd+r=reload_config
+
+# resize panes: down, up, left, right
+# ESC[1;3B, ESC[1;3A, ESC[1;3D, ESC[1;3C,
+keybind = alt+cmd+j=text:\x1b\x5b\x31\x3b\x33\x42
+keybind = alt+cmd+k=text:\x1b\x5b\x31\x3b\x33\x41
+keybind = alt+cmd+h=text:\x1b\x5b\x31\x3b\x33\x44
+keybind = alt+cmd+l=text:\x1b\x5b\x31\x3b\x33\x43
+
+# switch workplaces: left, right
+# ESC[1;2D, ESC[1;2C
+keybind = super+shift+h=text:\x1b\x5b\x31\x3b\x32\x44
+keybind = super+shift+l=text:\x1b\x5b\x31\x3b\x32\x43
+
+# select pane: down, up, left, right
+# ACK(^F) + hjkl
+keybind = super+j=text:\x06\x6a
+keybind = super+k=text:\x06\x6b
+keybind = super+h=text:\x06\x68
+keybind = super+l=text:\x06\x6c
+
+macos-option-as-alt = left
+keybind = alt+5=text:[
+keybind = alt+6=text:]
+keybind = alt+7=text:|
+keybind = alt+8=text:{
+keybind = alt+9=text:}
+keybind = alt+l=text:@
