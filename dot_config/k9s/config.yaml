@@ -1,0 +1,17 @@
+k9s:
+
+  body:
+    bgColor: default
+
+  liveViewAutoRefresh: false
+  refreshRate: 2
+  maxConnRetry: 5
+  readOnly: false
+  ui:
+    enableMouse: true
+    headless: false
+    logoless: true
+    splashless: true
+    crumbsless: false
+    noIcons: false
+    skin: in_the_navy

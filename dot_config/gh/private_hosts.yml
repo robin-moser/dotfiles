@@ -1,0 +1,5 @@
+github.com:
+    user: robin-moser
+    git_protocol: ssh
+    users:
+        robin-moser: {}
