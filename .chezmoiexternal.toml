@@ -1,3 +1,9 @@
+# Bash autocompletion helper
 [".bash/plugins/complete_alias"]
     type = "file"
     url = "https://raw.githubusercontent.com/cykerway/complete-alias/master/complete_alias"
+
+# Tmux plugin manager
+[".tmux/plugins/tpm"]
+    type = "git-repo"
+    url = "https://github.com/tmux-plugins/tpm"
