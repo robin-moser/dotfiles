@@ -27,7 +27,9 @@ alias _egrep='egrep'
 # Git and Version Control
 alias g='git'
 alias gith='git open 1>/dev/null'
+alias cm='chezmoi'
 complete -F _complete_alias g
+complete -F _complete_alias cm
 
 # Text Processing and Viewing
 alias diff='colordiff -W $(( $(tput cols) -2 ))'
