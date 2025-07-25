@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Hombrew installation
 eval "$(/opt/homebrew/bin/brew shellenv)"
 

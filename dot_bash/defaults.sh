@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # MacOS: ignore Deprication Warning
 export BASH_SILENCE_DEPRECATION_WARNING=1
 
