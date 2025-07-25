@@ -1,0 +1,224 @@
+TERM tmux
+TERM tmux-256color
+TERM xterm-ghostty
+
+
+# file types
+
+NORMAL          00
+FILE            00
+DIR             01;34
+OTHER_WRITABLE  34;47
+LINK            35
+
+# pipe, socket, block device, character device
+
+FIFO            01;35
+SOCK            01;35
+DOOR            01;35
+BLK             01;35
+CHR             01;35
+
+# file attributes
+
+ORPHAN          01;31
+MISSING         01;31
+
+# execute permission
+
+EXEC            01;32
+.cmd            01;32
+.exe            01;32
+.com            01;32
+.bat            01;32
+.reg            01;32
+.app            01;32
+
+# Text
+
+.org            38;5;180
+.md             38;5;180
+.mkd            38;5;180
+
+# Configuration Files
+
+.yml            38;5;167
+.yaml           38;5;167
+.json           38;5;167
+.ini            38;5;167
+.conf           38;5;167
+.cfg            38;5;167
+.env            38;5;167
+.make           38;5;167
+.makefile       38;5;167
+.mk             38;5;167
+
+# Image
+
+.bmp            38;5;173
+.cgm            38;5;173
+.dl             38;5;173
+.dvi            38;5;173
+.emf            38;5;173
+.eps            38;5;173
+.gif            38;5;173
+.jpeg           38;5;173
+.jpg            38;5;173
+.JPG            38;5;173
+.mng            38;5;173
+.pbm            38;5;173
+.pcx            38;5;173
+.pgm            38;5;173
+.png            38;5;173
+.PNG            38;5;173
+.ppm            38;5;173
+.pps            38;5;173
+.ppsx           38;5;173
+.ps             38;5;173
+.svg            38;5;173
+.svgz           38;5;173
+.tga            38;5;173
+.tif            38;5;173
+.tiff           38;5;173
+.xbm            38;5;173
+.xcf            38;5;173
+.xpm            38;5;173
+.xwd            38;5;173
+.xwd            38;5;173
+.yuv            38;5;173
+.nef            38;5;173
+.NEF            38;5;173
+.heic           38;5;173
+.HEIC           38;5;173
+
+# Audio
+
+.aac            38;5;73
+.au             38;5;73
+.flac           38;5;73
+.m4a            38;5;73
+.mid            38;5;73
+.midi           38;5;73
+.mka            38;5;73
+.mp3            38;5;73
+.mpa            38;5;73
+.mpeg           38;5;73
+.mpg            38;5;73
+.ogg            38;5;73
+.opus           38;5;73
+.ra             38;5;73
+.wav            38;5;73
+
+# Video
+
+.anx            38;5;175
+.asf            38;5;175
+.avi            38;5;175
+.axv            38;5;175
+.flc            38;5;175
+.fli            38;5;175
+.flv            38;5;175
+.gl             38;5;175
+.m2v            38;5;175
+.m4v            38;5;175
+.mkv            38;5;175
+.mov            38;5;175
+.MOV            38;5;175
+.mp4            38;5;175
+.mp4v           38;5;175
+.mpeg           38;5;175
+.mpg            38;5;175
+.nuv            38;5;175
+.ogm            38;5;175
+.ogv            38;5;175
+.ogx            38;5;175
+.qt             38;5;175
+.rm             38;5;175
+.rmvb           38;5;175
+.swf            38;5;175
+.vob            38;5;175
+.webm           38;5;175
+.wmv            38;5;175
+
+# Binary document formats and multimedia source
+
+.doc            38;5;215
+.docx           38;5;215
+.rtf            38;5;215
+.odt            38;5;215
+.dot            38;5;215
+.dotx           38;5;215
+.ott            38;5;215
+.xls            38;5;215
+.xlsx           38;5;215
+.ods            38;5;215
+.ots            38;5;215
+.ppt            38;5;215
+.pptx           38;5;215
+.odp            38;5;215
+.otp            38;5;215
+.fla            38;5;215
+.psd            38;5;215
+.pdf            38;5;215
+
+# Archives, compressed
+
+.7z             1;38;5;105
+.apk            1;38;5;105
+.arj            1;38;5;105
+.bin            1;38;5;105
+.bz             1;38;5;105
+.bz2            1;38;5;105
+.cab            1;38;5;105
+.deb            1;38;5;105
+.dmg            1;38;5;105
+.gem            1;38;5;105
+.gz             1;38;5;105
+.iso            1;38;5;105
+.jar            1;38;5;105
+.msi            1;38;5;105
+.rar            1;38;5;105
+.rpm            1;38;5;105
+.tar            1;38;5;105
+.tbz            1;38;5;105
+.tbz2           1;38;5;105
+.tgz            1;38;5;105
+.tx             1;38;5;105
+.war            1;38;5;105
+.xpi            1;38;5;105
+.xz             1;38;5;105
+.z              1;38;5;105
+.Z              1;38;5;105
+.zip            1;38;5;105
+.zst            1;38;5;105
+
+# Unimportant text files
+
+.log            38;5;241
+*~              38;5;241
+*#              38;5;241
+._*             38;5;241
+.editorconfig   38;5;241
+.gitignore      38;5;241
+.gitattributes  38;5;241
+.dockerignore   38;5;241
+
+
+# Unimportant non-text files
+
+.bak            38;5;240
+.BAK            38;5;240
+.old            38;5;240
+.OLD            38;5;240
+.off            38;5;240
+.OFF            38;5;240
+.dist           38;5;240
+.DIST           38;5;240
+.orig           38;5;240
+.ORIG           38;5;240
+.swp            38;5;240
+.swo            38;5;240
+.v              38;5;240
+.DS_Store       38;5;240
+*.swp           38;5;240
+.pyc            38;5;240

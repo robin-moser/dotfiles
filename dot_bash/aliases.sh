@@ -1,0 +1,375 @@
+### Aliases
+
+# Git and Version Control
+alias g='git'
+alias gith='git open 1>/dev/null'
+complete -F _complete_alias g
+
+# Text Processing and Viewing
+alias diff='colordiff -W $(( $(tput cols) -2 ))'
+alias sed='gsed'
+alias v='cst_fuzzy_vim'
+alias vm='nvim'
+alias vim='nvim'
+alias ql='cst_quicklook'
+
+# Development and DevOps
+alias oc='opencode'
+alias d='docker'
+alias dcc='docker compose'
+alias k='cst_kubectl_with_yaml'
+alias kd='cst_kubectl_diff'
+alias listen='cst_listen_ports'
+alias ghsecrets='cst_gh_secrets'
+alias dotoken='cst_do_token'
+complete -F _complete_alias d
+complete -F _complete_alias dcc
+complete -F __start_kubectl k
+
+# Search and Find
+alias ff='cst_find_file'
+alias ffs='cst_find_file_starts_with'
+alias ffe='cst_find_file_ends_with'
+alias ffc='cst_find_file_contains'
+alias fft='cst_find_text'
+alias grep='ggrep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+alias aw='cst_aw_watcher_grep aw-watcher-shell'
+alias awt='cst_aw_watcher_grep aw-watcher-tmux'
+alias awv='cst_aw_watcher_grep_vim'
+
+# File Operations and Safety
+alias cp='cp -i'
+alias mv='mv -i'
+alias extract='cst_extract_archive'
+alias make1mb='mkfile 1m ./1MB.dat'
+alias make5mb='mkfile 5m ./5MB.dat'
+alias make10mb='mkfile 10m ./10MB.dat'
+alias make1gb='mkfile 1g ./1GB.dat'
+
+# File and Directory Navigation
+alias c='cst_cd_fuzz .'
+alias cs='cd /swarm/volumes && c'
+alias cj='cst_cd_fuzz "$HOME/Documents"'
+alias cn='cst_cd_fuzz "$HOME/Nextcloud"'
+alias cv='cst_cd_fuzz "$HOME/Development'
+alias mcd='cst_make_and_change_dir'
+
+alias ..='cd ../'
+alias ...='cd ../../'
+alias .3='cd ../../../'
+alias .4='cd ../../../../'
+alias .5='cd ../../../../../'
+alias .6='cd ../../../../../../'
+
+# File Listing and Display
+alias ls='gls -phN --color=always'
+alias lt='ls -ltr'
+alias lk='ls -lSr'
+alias ll='ls -al --group-directories-first'
+alias l='ls -l --group-directories-first'
+alias lh='ls -ad .* --group-directories-first'
+alias llh='ls -ald .* --group-directories-first'
+alias llp='ll | less'
+alias tree='tree -aC --dirsfirst -I ".git|node_modules"'
+alias dree='tree -d -L 2'
+alias fn='open . >/dev/null'
+
+# System Utilities and Miscellaneous
+alias h='cst_format_history'
+alias which='type -all'
+alias path='echo -e ${PATH//:/\\n}'
+alias ncdu='gdu-go'
+alias watch='viddy'
+alias lookup='dscacheutil -q host -a name'
+alias copy='cst_copy_to_clipboard'
+alias dircolors='gdircolors'
+alias which='cst_recurse_which'
+
+alias promt='cst_prompt'
+alias password='cst_generate_password'
+
+
+### Custom Functions
+
+# Find files by exact name match
+cst_find_file() {
+    /usr/bin/find . -iname "$*"
+}
+
+# Find files that start with given pattern
+cst_find_file_starts_with() {
+    /usr/bin/find . -iname "$*"'*'
+}
+
+# Find files that end with given pattern
+cst_find_file_ends_with() {
+    /usr/bin/find . -iname '*'"$*"
+}
+
+# Find files that contain given pattern in name
+cst_find_file_contains() {
+    /usr/bin/find . -iname '*'"$*"'*'
+}
+
+# Search for text content recursively in files
+cst_find_text() {
+    grep --color=always -rn . -e "$@"
+}
+
+# Open files in MacOS Quick Look
+cst_quicklook() {
+    ( qlmanage -p "$@" >& /dev/null & ) > /dev/null 2>&1
+    osascript -e 'tell application "System Events" to set frontmost of (first process whose name is "qlmanage") to true'
+}
+
+# Enhanced kubectl with YAML formatting via yq
+cst_kubectl_with_yaml() {
+    if [[ "$*" == *"-o yaml"* ]]; then
+        command kubectl "$@" | yq eval '.'
+    else
+        command kubectl "$@"
+    fi
+}
+
+# Show kubectl diff output with color and pagination
+cst_kubectl_diff() {
+    kubectl diff "$@" | awk '/last-applied-configuration/{getline; next} {print}' | colordiff | less -S
+}
+
+# Fuzzy file finder with preview using bat
+cst_fuzzy_vim() {
+    local fl
+    fl=$(fd -H --type f --color always \
+        --exclude .git --exclude node_modules --exclude __pycache__ -- . "$@" | \
+        fzf --preview "bat {} --pager=never --color=always \
+        --style=changes,header,grid,snip" --margin 1%)
+
+    if test -n "$fl"; then
+        nvim "$fl"
+        history -s "vim $fl"
+    fi
+}
+
+# Copy file content or stdin to clipboard
+cst_copy_to_clipboard() {
+    if [ -f "${1:-x}" ]; then
+        pbcopy < "$1"
+    else
+        pbcopy
+    fi
+}
+
+# Display listening ports with process information
+cst_listen_ports() {
+    netstat -anv | \
+        awk '/LISTEN/ {print $1, $4, $11}' | \
+        sed -E -e 's/\.([[:digit:]]+) / \1 /' | \
+        sort -nk3 | \
+        while read -r l; do
+            pn="$(ps -p "${l/* /}" -o comm=)"
+            pa="$(ps -p "${l/* /}" -o command= | sed "s|^$pn||")"
+            echo -e "${l// /|}|$(basename "$pn")$pa"
+        done | \
+            /opt/homebrew/opt/util-linux/bin/column -t -R 2,3,4 -s'|' | \
+            sed -E 's/^(.{80}).{4}.*$/\1 .../'
+}
+
+# Create directory and change into it
+cst_make_and_change_dir() {
+    mkdir -p "$1" && cd "$1" || return
+}
+
+# Decrypt and return DigitalOcean token
+cst_do_token() {
+    gpg -d ~/.digitaloceantoken.gpg 2>/dev/null
+}
+
+# Interactively set GitHub secrets from encrypted file
+cst_gh_secrets() {
+    local vars token secret
+    vars=$(gpg -d ~/.githubsecrets.gpg 2>/dev/null)
+
+    for token in $( echo "$vars" | cut -d= -f1); do
+        if cst_prompt "set $token?" false; then
+            secret=$(echo "$vars" | grep "$token" | sed "s/$token=//")
+            gh secret set -R "$(git config --local remote.origin.url)" "$token" -b "$secret"
+        fi
+    done
+}
+
+# Fuzzy directory finder and changer with custom base path
+cst_cd_fuzz() {
+    local cmd dir target pruneopt
+    target="$1" && shift
+    pruneopt="$*"
+
+    if [[ "$target" == "." && "$PWD" == "$HOME" ]]; then
+        pruneopt="$pruneopt --max-depth 3"
+    fi
+
+    cmd="${FZF_ALT_C_COMMAND:-"\
+        command fd . \"$target\" --type d --color always --mount --follow --hidden \
+        --exclude node_modules --exclude venv --exclude __pypcache__ --exclude .git $pruneopt \
+    "}"
+
+    if dir=$(eval "$cmd" | fzf +m --reverse --preview 'tree -CNL 1 {} | head -200'); then
+        # replace leading ./ with current directory
+        hdir="${dir/#\.\//$PWD/}"
+        # replace absolute $HOME with ~
+        hdir="${hdir/#$HOME/\~}"
+
+        command cd "$dir" || return
+        history -s "cd $hdir"
+    fi
+}
+
+# Generate random password and copy to clipboard
+cst_generate_password() {
+    export LC_CTYPE=C
+    local password count chars char
+
+    count=${1:-20}
+    password=$(openssl rand -base64 "$count" | tr -dc "a-zA-Z0-9" | head -c "$count")
+
+    # Add special characters to the password
+    for ((n=0; n<$(( RANDOM % ( count / 2 ) + 2 )); n++)); do
+        chars='!?#-:.@%&+='
+        char="${chars:$(( RANDOM % 11 )):1}"
+        # shellcheck disable=SC2001
+        password=$(echo "$password" | sed "s/./$char/$(( (RANDOM % count) + 1 ))")
+    done
+
+    # if command gets piped, dont colorize
+    if [[ -t 1 ]]; then
+        while read -r -n1 character; do
+            case $character in
+                [0-9]) echo -n "$(tput setaf 4)${character}$(tput sgr0)" ;;
+                [A-Za-z]) echo -n "$(tput setaf 2)${character}$(tput sgr0)" ;;
+                *)     echo -n "$(tput setaf 1)${character}$(tput sgr0)" ;;
+            esac
+        done < <(echo -n "$password")
+        echo
+    else
+        echo -n "$password"
+    fi
+    echo "$password" | pbcopy
+    unset LC_CTYPE
+}
+
+# Parse current git branch with custom formatting
+cst_parse_git_branch() {
+    git branch 2> /dev/null \
+        | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/' \
+        | sed -e 's/(master)/𝗠/' \
+        | sed -e 's/(main)/𝗠/' \
+        | sed -e 's/(develop)/𝗗/'
+}
+
+# Format and colorize command history output
+cst_format_history() {
+    history | awk '
+    BEGIN {
+    # FPAT = "([[:space:]]*[^[:space:]]+)";
+    # OFS = "";
+}
+{
+    $1 = "\033[2;33m" $1 "\033[0m";
+    $2 = "\033[90m" $2 "\033[0m";
+    $3 = "\033[90m" $3 "\033[0m";
+    print
+}
+' | less -rn +G
+}
+
+# Enhanced which command that shows aliases and functions
+cst_recurse_which() {
+    local result cmd aliased
+    cmd="$1"
+
+    # Check if it's an alias
+    if result=$(alias "$cmd" 2>/dev/null); then
+        # Extract the aliased command
+        # shellcheck disable=SC2001
+        aliased=$(echo "$result" | sed "s/^[^=]*='\(.*\)'$/\1/")
+        echo "$cmd is aliased to \`$aliased'"
+
+        # Check if the aliased command is a function
+        if declare -f "$aliased" >/dev/null 2>&1; then
+            declare -f "$aliased"
+        fi
+    else
+        # Fall back to the original which command
+        command which "$cmd"
+    fi
+}
+
+cst_aw_watcher_grep() {
+    local search bucket host pattern replacement
+    bucket="${1:-aw-watcher-shell}"
+    search="$2"
+    host="${3:-_$HOSTNAME}"
+
+    case "$bucket" in
+        aw-watcher-shell)
+            pattern="- ([^{]*) \\{.*'cmdStr': '(.*)', 'code': ([0-9]*), 'cwd': '([^']*)'.*"
+            replacement='\\e[0;38;5;24m\1 \\e[0;38;5;45m\3: \\e[0;38;5;15m\2 \\e[0;38;5;239min \4' ;;
+        aw-watcher-neovim)
+            pattern="- ([^{]*) \\{.*'branch': '([^']*)', 'file': '([^']*)', 'language': '([^']*)', 'project': '([^']*)'.*"
+            replacement='\\e[0;38;5;24m\1 \\e[0;38;5;15m\3 \\e[0;38;5;45m(\4) \\e[0;38;5;239min \5:\2' ;;
+        aw-watcher-vim)
+            pattern="- ([^{]*) \\{.*'file': '([^']*)', 'language': '([^']*)', 'project': '([^']*)'.*"
+            replacement='\\e[0;38;5;24m\1 \\e[0;38;5;15m\2 \\e[0;38;5;45m(\3) \\e[0;38;5;239min \4' ;;
+        *)
+            pattern="- ([^{]*) (\\{.*\\})"
+            replacement='\\e[0;38;5;24m\1\\e[0m \2' ;;
+    esac
+    echo -e "$(aw-client events "$bucket$host" | \
+        grep "$search" | tac | \
+        sed -Ee "s/$pattern/$replacement/" \
+            -e "s|$HOME|~|g" \
+            -e 's|\\\\n|\n|g' \
+            )"
+}
+
+# Combine aw-watcher events for Vim and Neovim
+cst_aw_watcher_grep_vim() {
+    (
+        cst_aw_watcher_grep aw-watcher-vim "$1" | sed 's/)/) (v)/'
+        cst_aw_watcher_grep aw-watcher-neovim "$1" | sed 's/)/) (n)/'
+    ) | sort
+}
+
+# Extract various archive formats automatically
+cst_extract_archive() {
+    if [[ ! -f "$1" ]]; then
+        echo "'$1' is not a valid file"
+        return 1
+    fi
+
+    case "$1" in
+        *.tar.bz2) tar xjf "$1" ;;
+        *.tar.gz)  tar xzf "$1" ;;
+        *.tar)     tar xf "$1" ;;
+        *.tbz2)    tar xjf "$1" ;;
+        *.tgz)     tar xzf "$1" ;;
+        *.bz2)     bunzip2 "$1" ;;
+        *.gz)      gunzip "$1" ;;
+        *.zip)     unzip "$1" ;;
+        *) echo "'$1' cannot be extracted via extract()" ;;
+    esac
+}
+
+# Interactive Y/N prompt with customizable default
+cst_prompt() {
+    local MSG CONDITION
+    [[ "$2" == "false" ]] && CONDITION="[y/N]" || CONDITION="[Y/n]"
+    MSG=$(echo -e "\033[0;36m$1 $CONDITION\033[0m")
+    read -r -p "$MSG"
+    if [[ "$2" == "false" ]]; then
+        [[ $REPLY =~ ^[Yy]$ ]] && return 0 || return 1
+    else
+        [[ $REPLY =~ ^[Nn]$ ]] && return 1 || return 0
+    fi
+}

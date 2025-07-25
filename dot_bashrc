@@ -1,0 +1,85 @@
+#!/bin/bash
+
+[[ $- == *i* ]] || return
+
+accent_color="38;2;255;158;100m"
+
+export PS1='\
+\[\033[1m\]\
+\[\033[$accent_color\]\u\
+\[\033[0m\]\
+\[\033[38;5;$(getstatuscolor)\]:\
+\[\033[38;5;244m\]\W\
+\[\e[32m\]$(cst_parse_git_branch) \
+\[\033[38;5;244m\]\\$\[$(tput sgr0)\]\
+\[\e[0m\] '
+
+getstatuscolor() {
+    if [[ $? == "0" ]]; then
+        printf '15m'
+    else
+        printf '209m'
+    fi
+}
+
+# history search with arrow keys
+bind '"\e[A": history-search-backward'
+bind '"\e[B": history-search-forward'
+bind '"\eOA": history-search-backward'
+bind '"\eOB": history-search-forward'
+
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+[[ -r "/opt/homebrew/etc/profile.d/bash_completion.sh" ]] &&
+    . "/opt/homebrew/etc/profile.d/bash_completion.sh"
+
+# set history options
+shopt -s histappend
+
+HISTSIZE=
+HISTFILESIZE=
+HISTCONTROL=ignoreboth
+HISTTIMEFORMAT="[%F %T] "
+HISTFILE=$HOME/.history
+PROMPT_COMMAND='history -a'
+
+export TMUX_BIN="$HOME/Development/repos/tmux/tmux"
+
+# autostart tmux
+[[ -z $TMUX ]] && $TMUX_BIN
+
+source ~/.bash/plugins/complete_alias
+
+source ~/.bash/defaults.sh
+
+source ~/.bash/path.sh
+
+source ~/.bash/aliases.sh
+
+# load dircolors if commanad exists and file exists
+[[ -f ~/.dircolors ]] && \
+    eval "$(dircolors -b ~/.dircolors 2>/dev/null)"
+
+# init fuzzy finder
+[[ -f ~/.fzf.bash ]] && \
+    source ~/.fzf.bash
+
+# activitywatch
+[[ -n "$TMUX" && -f ~/.aw-watcher/aw-watcher-shell ]] && \
+    source ~/.aw-watcher/aw-watcher-shell
+
+# orbstack
+[[ -f ~/.orbstack/shell/init.bash ]] && \
+    source ~/.orbstack/shell/init.bash
+
+# pyenv
+if command -v pyenv 1>/dev/null 2>&1; then
+    eval "$(pyenv init -)"
+fi
+
+# zoxide
+if command -v zoxide 1>/dev/null 2>&1; then
+    eval "$(zoxide init bash --cmd cd)"
+fi
