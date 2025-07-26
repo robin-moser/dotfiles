@@ -2,6 +2,10 @@
 
 set -euo pipefail
 
+{{- $keyFile := joinPath .chezmoi.homeDir ".gnupg/private-keys-v1.d/5550896B0A6D5C0E08E91DFA0CD31EC47C7839DA.key" }}
+{{- if not (stat $keyFile) }}
+
+
 # Temporary directory for key files
 TEMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TEMP_DIR"' EXIT
@@ -48,3 +52,7 @@ else
 fi
 
 echo "GPG key import and trust configuration completed successfully"
+{{- else }}
+{{- end }}
+
+# vi: ft=bash
