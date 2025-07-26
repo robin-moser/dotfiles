@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 
-# Hombrew installation
-eval "$(/opt/homebrew/bin/brew shellenv)"
+if [[ -f /opt/homebrew/bin/brew ]]; then
 
-# Homebrew keg-only packages
-export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
-export PATH="/opt/homebrew/opt/icu4c/bin:$PATH"
-export PATH="/opt/homebrew/opt/curl/bin:$PATH"
+    # Hombrew installation
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+
+    # Homebrew keg-only packages
+    export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
+    export PATH="/opt/homebrew/opt/icu4c/bin:$PATH"
+    export PATH="/opt/homebrew/opt/curl/bin:$PATH"
+
+fi
 
 # Custom bin locations
 export PATH="$HOME/.local/bin:$PATH"

@@ -45,7 +45,11 @@ HISTTIMEFORMAT="[%F %T] "
 HISTFILE=$HOME/.history
 PROMPT_COMMAND='history -a'
 
-export TMUX_BIN="$HOME/Development/repos/tmux/tmux"
+# try custom compiled tmux
+TMUX_BIN="$HOME/Development/repos/tmux/tmux"
+
+# if not found, use tmux from package manager
+[[ -f $TMUX_BIN ]] || TMUX_BIN="$(command which tmux)"
 
 # autostart tmux
 [[ -z $TMUX ]] && $TMUX_BIN
