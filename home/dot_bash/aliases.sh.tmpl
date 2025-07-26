@@ -220,13 +220,13 @@ cst_make_and_change_dir() {
 
 # Decrypt and return DigitalOcean token
 cst_do_token() {
-    gpg -d ~/.digitaloceantoken.gpg.asc 2>/dev/null
+    gpg -d ~/.token.digitalocean.gpg.asc 2>/dev/null
 }
 
 # Interactively set GitHub secrets from encrypted file
 cst_gh_secrets() {
     local vars token secret
-    vars=$(gpg -d ~/.githubsecrets.gpg.asc 2>/dev/null)
+    vars=$(gpg -d ~/.secrets.github.gpg.asc 2>/dev/null)
 
     for token in $(echo "$vars" | cut -d= -f1); do
         if cst_prompt "set $token?" false; then
