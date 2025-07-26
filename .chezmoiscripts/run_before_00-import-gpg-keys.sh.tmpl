@@ -1,0 +1,49 @@
+#!/bin/bash
+
+set -euo pipefail
+
+# Bitwarden item ID for GPG keys
+BITWARDEN_ITEM_ID="175d22d8-62f4-46b8-ab3e-49ea726b4d00"
+
+# Temporary directory for key files
+TEMP_DIR=$(mktemp -d)
+trap 'rm -rf "$TEMP_DIR"' EXIT
+
+echo "Downloading GPG keys from Bitwarden..."
+
+# Download private key attachment
+{{ bitwardenAttachment "PrivateKey" $BITWARDEN_ITEM_ID | writeToFile "$TEMP_DIR/private.gpg" -}}
+
+# Download public key attachment
+{{ bitwardenAttachment "PublicKey" $BITWARDEN_ITEM_ID | writeToFile "$TEMP_DIR/public.gpg" -}}
+
+# Get the key fingerprint
+FINGERPRINT=$(gpg --with-colons --import-options show-only --import "$TEMP_DIR/private.gpg" 2>/dev/null | awk -F: '/^fpr:/{print $10}')
+
+# Check if keys already imported
+if gpg --list-secret-keys "$FINGERPRINT" >/dev/null 2>&1; then
+    echo "GPG private key already imported (fingerprint: $FINGERPRINT)"
+else
+    echo "Importing GPG private key..."
+    gpg --batch --import "$TEMP_DIR/private.gpg"
+    echo "Successfully imported GPG private key (fingerprint: $FINGERPRINT)"
+fi
+
+# Import public key (safe to re-import)
+echo "Importing GPG public key..."
+gpg --batch --import "$TEMP_DIR/public.gpg"
+
+# Set ultimate trust on the key (since it's your own key)
+echo "Setting ultimate trust on your GPG key..."
+echo "$FINGERPRINT:6:" | gpg --batch --import-ownertrust
+
+# Verify trust level
+TRUST_LEVEL=$(gpg --with-colons --list-keys "$FINGERPRINT" | awk -F: '/^pub:/{print $2}')
+if [ "$TRUST_LEVEL" = "u" ]; then
+    echo "GPG key successfully set to ultimate trust"
+else
+    echo "Warning: GPG key trust level is '$TRUST_LEVEL' (expected 'u' for ultimate)"
+fi
+
+echo "GPG key import and trust configuration completed successfully"
+
