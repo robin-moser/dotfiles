@@ -1,0 +1,196 @@
+[alias]
+
+  a = add
+  b = branch
+  c = commit
+  d = diff
+  f = fetch
+  g = grep
+  l = log
+  m = merge
+  p = pull
+  r = remote
+  s = status
+  w = whatchanged
+
+  ### add ###
+
+  aa = add --all
+  ap = add --patch
+  au = add --update
+
+  ### branch ###
+
+  be = branch --edit-description
+  bm = branch --merged
+  bnm = branch --no-merged
+
+  ### commit ###
+
+  ca = commit --amend
+  ci = commit --interactive
+  cm = commit --message
+
+  ### diff ###
+
+  dc = diff --cached
+  dw = diff --color-words='[^[:space:]]|([[:alnum:]]|UTF_8_GUARD)+' --color
+
+  ### clean ###
+
+  cleanest = clean -ffdx
+
+  ### grep ###
+
+  gl =  grep --line-number
+  gg =  grep --break --heading --line-number
+
+  ### log ###
+
+  lo = log --oneline
+  lp = log --patch
+  ll = log --graph --topo-order --abbrev-commit --date=short --decorate --all --boundary --pretty=format:'%Cgreen%ad %Cred%h%Creset -%C(yellow)%d%Creset %s %Cblue[%cn]%Creset %Cgreen%GS%Creset'
+
+  log-me = !git log --author $(git config user.email)
+  log-standup = !git log --since yesterday --author $(git config user.email) --pretty=short
+
+
+  ## ls-files ##
+
+  ls = ls-files
+  ignored = ls-files --others --i --exclude-standard
+
+  ### merge ###
+
+  mn = merge --no-ff
+
+  ### pull ###
+
+  pf = pull --ff-only
+  pr = pull --rebase
+
+  ### rebase ###
+
+  rb = rebase
+  rbc = rebase --continue
+  rbs = rebase --skip
+
+  rbiu = rebase --interactive @{upstream}
+  rbim = rebase --interactive master
+  rbi = rebase --interactive
+
+  ### reflog ###
+
+  rl = reflog
+
+  ### remote ###
+
+  rru = remote update
+  rrp = remote prune
+
+  ### show-branch ###
+
+  sb = show-branch
+
+  ### submodule ###
+
+  sm = submodule
+  smu = submodule update
+  smui = submodule update --init --recursive
+
+  ### status ###
+
+  ss = status --short --branch
+
+  ### lookup ###
+
+  whois = "!sh -c 'git log --regexp-ignore-case -1 --pretty=\"format:%an <%ae>\n\" --author=\"$1\"' -"
+  who = shortlog --summary --numbered --no-merges
+
+  ### workflow ###
+
+  cloner = clone --recursive
+
+  snapshot = !git stash push "snapshot: $(date)" && git stash apply "stash@{0}"
+
+  panic = !tar cvf ../$(basename -s .git $(git config --get remote.origin.url)).tar *
+
+  ignore = "!echo -e '# UNTRACKED FILES' >> .gitignore; git status | grep -P \"^\\t\" | grep -vF .gitignore | sed \"s/^\\t//\" >> .gitignore"
+
+	open = "!openrepo(){ open $(git remote get-url ${1:-origin} | gsed -e's/git@/http:\\/\\//' -e's/\\.git$//' | gsed -E 's/(\\/\\/[^:]*):/\\1\\//')/tree/$(git symbolic-ref --quiet --short HEAD )/$(git rev-parse --show-prefix);}; openrepo"
+
+  ### reset & undo ###
+
+  reset-commit       = reset --soft HEAD~1
+  reset-commit-hard  = reset --hard HEAD~1
+
+  discard = checkout --
+  cleanout = !git clean -df && git checkout -- .
+
+  # Assume
+  #
+  # Sometimes we want to change a file in a repo, but never check in your edits.
+  # We can't use .gitignore because the file is tracked. We use update-index.
+  #
+  # If you interact with big corporate projects, such as projects in Subversion,
+  # then you might run into the need to ignore certain files which are under
+  # Subversion control, yet you need to modify them but not commit.
+  # The assume-unchanged flag comes to the rescue.
+  #
+  # Suppose we want to edit passwords.txt and for god's sake never check it in:
+  #
+  #     $ git status
+  #     modified passwords.txt
+  #     modified foo.txt
+  #
+  #     $ git assume passwords.txt
+  #     $ git status
+  #     modified foo.txt
+  #
+  #     $ git assumed
+  #     passwords.txt
+  #
+  #     $ git unassume passwords.txt
+  #     $ git status
+  #     modified passwords.txt
+  #     modified foo.txt
+  #
+  # Thanks to http://durdn.com/blog/2012/11/22/must-have-git-aliases-advanced-examples/
+  # Thanks to http://blog.apiaxle.com/post/handy-git-tips-to-stop-you-getting-fired/
+
+  assume   = update-index --assume-unchanged
+  unassume = update-index --no-assume-unchanged
+  assumed  = !"git ls-files -v | grep ^h | cut -c 3-"
+
+  # Delete all branches that have already been merged into the master branch.
+  master-cleanse = "!git master-cleanse-local; git master-cleanse-remote"
+
+  # Delete all local branches that have been merged into the local master branch.
+  master-cleanse-local = "!git checkout master && git branch --merged | xargs git branch --delete"
+
+  # Delete all remote branches that have been merged into the remote master branch.
+  master-cleanse-remote = !"git branch --remotes --merged origin/master | sed 's# *origin/##' | grep -v '^master$' xargs -I% git push origin :% 2>&1 | grep --colour=never 'deleted'"
+
+  # Publish the current branch by pushing it to the remote "origin",
+  # and setting the current branch to track the upstream branch.
+  publish = !"git push --set-upstream origin $(git branch-name)"
+
+  # Unpublish the current branch by deleting the
+  # remote version of the current branch.
+  unpublish = !"git push origin :$(git branch-name)"
+
+  ### SHELL SCRIPTING ALIASES ###
+
+  # Get the current branch name
+  branch-name = rev-parse --abbrev-ref HEAD
+
+  # Get name of the upstream branch
+  upstream-name = !git for-each-ref --format='%(upstream:short)' $(git symbolic-ref -q HEAD)
+
+  # Get the top level directory, regardless of what subdirectory we're in.
+  # root = ! pwd # this one is funny but slow
+  root = rev-parse --show-toplevel
+
+  lo = "!git log --oneline | fzf --multi --preview 'git show --color=always {+1}' --preview-window down:70%:sharp"
+
+# vi: ft=gitconfig

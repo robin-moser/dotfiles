@@ -1,0 +1,46 @@
+[user]
+	name = Robin Moser
+    email = mail@robinmoser.de
+    signingkey = 7544FB5D4BE0AE8E
+
+[init]
+    defaultBranch = main
+
+[commit]
+    gpgsign = true
+
+[includeIf "gitdir:swarm/volumes/"]
+    path = ~/.gitconfig-hmm
+
+[includeIf "gitdir:Development/Holzmann/"]
+    path = ~/.gitconfig-hmm
+
+[include]
+    path = ~/.gitalias
+
+[url "https://"]
+    insteadOf = git://
+
+
+[filter "lfs"]
+    required = true
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
+
+[pager]
+    diff = delta
+    log = less -S
+
+[color "diff"]
+    meta = white
+
+[delta]
+    plus-color = "#012800"
+    minus-color = "#340001"
+
+[interactive]
+    diffFilter = delta --color-only
+
+[pull]
+    rebase = true
