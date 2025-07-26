@@ -52,7 +52,10 @@ else
 fi
 
 echo "GPG key import and trust configuration completed successfully"
+
 {{- else }}
+echo "GPG private key already exists at {{ $keyFile }}. Skipping import."
+
 {{- end }}
 
 # vi: ft=bash
