@@ -1,16 +1,18 @@
 #!/usr/bin/env bash
 
-if [[ -f /opt/homebrew/bin/brew ]]; then
+{{- if eq .chezmoi.os "darwin" }}
+# Hombrew installation
+eval "$(/opt/homebrew/bin/brew shellenv)"
 
-    # Hombrew installation
-    eval "$(/opt/homebrew/bin/brew shellenv)"
+# Homebrew keg-only packages
+export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
+export PATH="/opt/homebrew/opt/icu4c/bin:$PATH"
+export PATH="/opt/homebrew/opt/curl/bin:$PATH"
 
-    # Homebrew keg-only packages
-    export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
-    export PATH="/opt/homebrew/opt/icu4c/bin:$PATH"
-    export PATH="/opt/homebrew/opt/curl/bin:$PATH"
+{{- else }}
+export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 
-fi
+{{- end }}
 
 # Custom bin locations
 export PATH="$HOME/.local/bin:$PATH"
