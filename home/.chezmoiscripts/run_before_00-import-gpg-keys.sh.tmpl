@@ -2,9 +2,6 @@
 
 set -euo pipefail
 
-# Bitwarden item ID for GPG keys
-BITWARDEN_ITEM_ID="175d22d8-62f4-46b8-ab3e-49ea726b4d00"
-
 # Temporary directory for key files
 TEMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TEMP_DIR"' EXIT
@@ -12,10 +9,10 @@ trap 'rm -rf "$TEMP_DIR"' EXIT
 echo "Downloading GPG keys from Bitwarden..."
 
 # Download private key attachment
-{{ bitwardenAttachment "PrivateKey" $BITWARDEN_ITEM_ID | writeToFile "$TEMP_DIR/private.gpg" -}}
+{{ bitwardenAttachment "PrivateKey" "175d22d8-62f4-46b8-ab3e-49ea726b4d00" | writeToFile "$TEMP_DIR/private.gpg" -}}
 
 # Download public key attachment
-{{ bitwardenAttachment "PublicKey" $BITWARDEN_ITEM_ID | writeToFile "$TEMP_DIR/public.gpg" -}}
+{{ bitwardenAttachment "PublicKey" "175d22d8-62f4-46b8-ab3e-49ea726b4d00" | writeToFile "$TEMP_DIR/public.gpg" -}}
 
 # Get the key fingerprint
 FINGERPRINT=$(gpg --with-colons --import-options show-only --import "$TEMP_DIR/private.gpg" 2>/dev/null | awk -F: '/^fpr:/{print $10}')
