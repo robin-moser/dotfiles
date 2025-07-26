@@ -8,14 +8,19 @@ trap 'rm -rf "$TEMP_DIR"' EXIT
 
 echo "Downloading GPG keys from Bitwarden..."
 
+# cd to the temporary directory
+cd "$TEMP_DIR" || exit 1
+
 # Download private key attachment
-{{ bitwardenAttachment "PrivateKey" "175d22d8-62f4-46b8-ab3e-49ea726b4d00" | writeToFile "$TEMP_DIR/private.gpg" -}}
+echo "{{- bitwardenAttachment "PrivateKey" "175d22d8-62f4-46b8-ab3e-49ea726b4d07" -}}" >"$TEMP_DIR/private.gpg"
 
 # Download public key attachment
-{{ bitwardenAttachment "PublicKey" "175d22d8-62f4-46b8-ab3e-49ea726b4d00" | writeToFile "$TEMP_DIR/public.gpg" -}}
+echo "{{- bitwardenAttachment "PublicKey" "175d22d8-62f4-46b8-ab3e-49ea726b4d07" -}}" >"$TEMP_DIR/public.gpg"
 
 # Get the key fingerprint
-FINGERPRINT=$(gpg --with-colons --import-options show-only --import "$TEMP_DIR/private.gpg" 2>/dev/null | awk -F: '/^fpr:/{print $10}')
+FINGERPRINT=$(gpg --with-colons --import-options show-only --import "$TEMP_DIR/private.gpg" 2>/dev/null |
+    awk -F: '/^fpr:/{print $10}' |
+    head -n1)
 
 # Check if keys already imported
 if gpg --list-secret-keys "$FINGERPRINT" >/dev/null 2>&1; then
@@ -43,4 +48,3 @@ else
 fi
 
 echo "GPG key import and trust configuration completed successfully"
-
