@@ -2,7 +2,11 @@
 
 [[ $- == *i* ]] || return
 
+{{- if eq .chezmoi.os "darwin" }}
 accent_color="38;2;255;158;100m"
+{{- else }}
+accent_color="38;2;115;200;240m"
+{{- end }}
 
 export PS1='\
 \[\033[1m\]\
