@@ -327,8 +327,11 @@ cst_recurse_which() {
     visited_list="$2"
 
     if [[ " $visited_list " == *" $cmd "* ]]; then
-        echo -e "\033[1;33m$cmd\033[0m is $(command which "$cmd")"
-        return
+        resolved=$(command -v "$cmd")
+        while [ -L "$resolved" ]; do
+            resolved=$(readlink "$resolved")
+        done
+        echo -e "\033[1;33m$cmd\033[0m is $resolved"
     fi
 
     # Add current command to visited list
@@ -354,6 +357,11 @@ cst_recurse_which() {
         else
             # Fall back to the original which command
             echo -e "\033[1;33m$cmd\033[0m is $(command which "$cmd")"
+            resolved=$(command -v "$cmd")
+            while [ -L "$resolved" ]; do
+                resolved=$(readlink "$resolved")
+                echo -e "\033[1;33m$cmd\033[0;38;5;242m is $resolved\033[0m"
+            done
         fi
     fi
 }
