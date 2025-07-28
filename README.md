@@ -16,7 +16,7 @@ xcode-select --install
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 # Install required tools
-brew install git gpg chezmoi bw coreutils util-linux grep gnu-sed findutils
+brew install git gpg chezmoi bitwarden-cli coreutils
 
 # Init chezmoi repo
 chezmoi init robin-moser
@@ -66,7 +66,7 @@ chezmoi apply
 **macOS:**
 ```bash
 # Install remaining tools via Homebrew
-brew bundle --file=~/.brewfile
+brew bundle --global install
 ```
 
 **Linux:**
