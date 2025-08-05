@@ -9,14 +9,18 @@ managed with [chezmoi](https://chezmoi.io/).
 
 **macOS:**
 ```bash
-# Install Xcode Command Line Tools
-xcode-select --install
-
 # Install Homebrew (https://brew.sh/)
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 # Install required tools
-brew install git gpg chezmoi bitwarden-cli coreutils
+brew install bash git gpg chezmoi bitwarden-cli
+
+# Add Homebrew to PATH
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# Change default shell to homebrew bash
+echo "$(brew --prefix)/bin/bash" | sudo tee -a /etc/shells
+chsh -s "$(brew --prefix)/bin/bash"
 
 # Init chezmoi repo
 chezmoi init robin-moser
@@ -25,7 +29,7 @@ chezmoi init robin-moser
 **Linux:**
 ```bash
 # Install required packages
-sudo apt update && apt install curl git gpg
+sudo apt update && sudo apt install curl git gpg gcc build-essential coreutils
 
 # Install chezmoi
 BINDIR=$HOME/.local/bin sh -c "$(curl -fsLS get.chezmoi.io)"
@@ -55,10 +59,11 @@ npm install -g @bitwarden/cli
 bw config server https://pass.robinmoser.de
 
 # Login to Bitwarden to store 2FA code
-bw login robin@moser
+bw login robin@moser && bw sync
 
 # Now apply all remaining dotfiles, GPG keys and other configurations
 chezmoi apply
+
 ```
 
 ### Install remaining tools
@@ -73,12 +78,15 @@ brew bundle --global install
 ```bash
 # Install remaining tools via apt
 sudo apt install -y \
-    tmux fzf fd-find bat ripgrep yq tree colordiff \
-    gdu viddy kubectl k9s gh coreutils pyenv zoxide
+    tree colordiff zoxide dnsutils \
+    fzf fd-find bat ripgrep jq yq gh \
 
 # Install Neovim
 curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
 sudo tar -C /opt -xzf nvim-linux-x86_64.tar.gz && rm nvim-linux-x86_64.tar.gz
+
+# Isnstall Neovim plugins using lockfile
+nvim --headless "+Lazy! restore" +qa
 ```
 
 

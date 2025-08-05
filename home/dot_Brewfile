@@ -2,9 +2,6 @@
 
 tap "deskflow/tap"
 tap "fluxcd/tap"
-tap "homebrew/bundle"
-tap "homebrew/services"
-tap "kismetwireless/kismet"
 tap "msoap/tools"
 tap "oven-sh/bun"
 tap "sst/tap"
