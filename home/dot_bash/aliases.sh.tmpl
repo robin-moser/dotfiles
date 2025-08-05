@@ -95,7 +95,7 @@ alias l='ls -l --group-directories-first'
 alias lh='ls -ad .* --group-directories-first'
 alias llh='ls -ald .* --group-directories-first'
 alias llp='ll | less'
-alias tree='tree -aC --dirsfirst -I ".git|node_modules"'
+alias tree='tree -aC --dirsfirst -I ".git|node_modules|.next"'
 alias dree='tree -d -L 2'
 alias fn='open . >/dev/null'
 
@@ -203,7 +203,9 @@ cst_kubectl_diff() {
 cst_fuzzy_vim() {
     local fl
     fl=$(fd -H --type f --color always \
-        --exclude .git --exclude node_modules --exclude __pycache__ -- . "$@" |
+        --exclude .git --exclude node_modules --exclude __pycache__ \
+        --exclude .next --exclude venv \
+        -- . "$@" |
         fzf --preview "bat {} --pager=never --color=always \
         --style=changes,header,grid,snip" --margin 1%)
 
