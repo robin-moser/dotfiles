@@ -21,7 +21,7 @@ vim.keymap.set("n", "<C-s>", function()
 end, opts("Format and save"))
 
 -- save file without auto-formatting
-vim.keymap.set("n", "<leader>sn", function()
+vim.keymap.set("n", "<C-w>", function()
   vim.cmd("noautocmd w")
 end, opts("Save without formatting"))
 
