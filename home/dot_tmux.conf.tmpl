@@ -1,3 +1,20 @@
+{{- if eq .chezmoi.os "darwin" }}
+# MacOS specific Configuration
+# ─────────────────────────
+
+accentcolor='#FF9E64'
+
+# Always enable extended keys (function keys, arrow keys with modifiers)
+set -g extended-keys always
+
+{{- else }}
+# Linux specific Configuration
+# ─────────────────────────
+
+accentcolor='#73C8F0'
+
+{{- end }}
+
 # General Configuration
 # ─────────────────────────
 
@@ -24,9 +41,6 @@ set -g status-keys vi
 
 # Set scrollback buffer size (number of lines to remember)
 set -g history-limit 15000
-
-# Always enable extended keys (function keys, arrow keys with modifiers)
-set -g extended-keys always
 
 # Enable italic text support in xterm-compatible terminals
 set -as terminal-overrides ',xterm*:sitm=\E[3m'
@@ -143,7 +157,6 @@ run '~/.tmux/plugins/tpm/tpm'
 # Color scheme and styling
 # ─────────────────────────
 
-accentcolor='#FF9E64'
 accentcolortext='#000000'
 
 selectioncolor='#252832'

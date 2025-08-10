@@ -22,6 +22,8 @@ alias _grep='grep'
 alias _fgrep='fgrep'
 alias _egrep='egrep'
 
+alias fd='fdfind'
+
 {{- end }}
 
 # Git and Version Control
@@ -249,7 +251,7 @@ cst_cd_fuzz() {
     fi
 
     cmd="${FZF_ALT_C_COMMAND:-"\
-        command fd . \"$target\" --type d --color always --mount --follow --hidden \
+        fd . \"$target\" --type d --color always --mount --follow --hidden \
         --exclude node_modules --exclude venv --exclude __pypcache__ --exclude .git $pruneopt \
     "}"
 

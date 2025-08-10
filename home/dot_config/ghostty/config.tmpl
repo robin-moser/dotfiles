@@ -40,6 +40,11 @@ font-style-bold = ExtraBold
 link-url = true
 confirm-close-surface = false
 
+{{- if eq .chezmoi.os "darwin" }}
+
+# MaCos specific:
+# -------------------------------
+
 keybind = cmd+t=toggle_quick_terminal
 keybind = cmd+r=reload_config
 
@@ -69,3 +74,13 @@ keybind = alt+7=text:|
 keybind = alt+8=text:{
 keybind = alt+9=text:}
 keybind = alt+l=text:@
+
+{{- else }}
+
+# Linux specific:
+# -------------------------------
+
+font-size = 10.5
+keybind = ctrl+v=paste_from_clipboard
+
+{{- end }}
