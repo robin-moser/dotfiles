@@ -179,7 +179,11 @@ activitycolortext='#bbbbbb'
 # Pane border styling
 set -g pane-border-style "fg=$bordercolor,bg=$inactivepanecolor"
 set -g pane-active-border-style "fg=$bordercolor,bg=$inactivepanecolor"
-set -g pane-marked-border-style "fg=$markedcolor,bg=$inactivepanecolor"
+
+# Only set pane-marked-border-style if running custom tmux build with available option
+run-shell 'tmux show-options -g pane-marked-border-style >/dev/null 2>&1 && \
+    tmux set -g pane-marked-border-style "fg=$markedcolor,bg=$inactivepanecolor" || \
+    true'
 
 # Popup window border styling
 set -g popup-border-style "fg=$markedcolor,bg=$inactivepanecolor"
