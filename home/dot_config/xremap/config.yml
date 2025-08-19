@@ -1,0 +1,13 @@
+# find keynames with:
+# sudo RUST_LOG=debug xremap config.yml
+
+virtual_modifiers:
+  - CapsLock
+keymap:
+  - remap:
+      CapsLock-h: KEY_RIGHTALT-KEY_8 # [
+      CapsLock-l: KEY_RIGHTALT-KEY_9 # ]
+      CapsLock-j: KEY_RIGHTALT-KEY_7 # {
+      CapsLock-k: KEY_RIGHTALT-KEY_0 # }
+      CapsLock-i: KEY_RIGHTALT-KEY_MINUS # \
+      CapsLock-o: KEY_RIGHTALT-KEY_102ND # |

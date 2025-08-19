@@ -1,0 +1,12 @@
+[Unit]
+Description=Xremap
+After=default.target
+
+[Service]
+ExecStart=/home/robin/.local/share/cargo/bin/xremap --watch=device %h/.config/xremap/config.yml
+Restart=always
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

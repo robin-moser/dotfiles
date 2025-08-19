@@ -1,0 +1,7 @@
+# ignore linux specific config files on other systems
+{{- if ne .chezmoi.os "linux" }}
+
+.config/systemd
+.config/xremap
+
+{{- end }}

@@ -85,6 +85,16 @@ sudo apt install -y \
 curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
 sudo tar -C /opt -xzf nvim-linux-x86_64.tar.gz && rm nvim-linux-x86_64.tar.gz
 
+# Install xremap
+rustup default  stable
+cargo install xremap --features gnome
+systemctl --user start xremap.service
+systemctl --user enable xremap.service
+```
+
+### Initialize nvim
+
+```bash
 # Isnstall Neovim plugins using lockfile
 nvim --headless "+Lazy! restore" +qa
 ```
