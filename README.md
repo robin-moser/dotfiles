@@ -81,6 +81,9 @@ sudo apt install -y \
     tree colordiff zoxide dnsutils \
     fzf fd-find bat ripgrep jq yq gh \
 
+# Install pyenv
+curl -fsSL https://pyenv.run | bash
+
 # Build tmux (extended-keys support since 3.6)
 sudo apt install autoconf automake pkg-config libevent-dev \
     ncurses-dev build-essential bison pkg-config
