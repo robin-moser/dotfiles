@@ -81,6 +81,15 @@ sudo apt install -y \
     tree colordiff zoxide dnsutils \
     fzf fd-find bat ripgrep jq yq gh \
 
+# Build tmux (extended-keys support since 3.6)
+sudo apt install autoconf automake pkg-config libevent-dev \
+    ncurses-dev build-essential bison pkg-config
+git clone https://github.com/tmux/tmux ~/Development/repos/tmux
+cd ~/Development/repos/tmux
+sh autogen.sh
+./configure && make
+ln -s /home/robin/Development/repos/tmux/tmux ~/.local/bin/
+
 # Install Neovim
 curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
 sudo tar -C /opt -xzf nvim-linux-x86_64.tar.gz && rm nvim-linux-x86_64.tar.gz

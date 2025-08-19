@@ -4,9 +4,6 @@
 
 accentcolor='#FF9E64'
 
-# Always enable extended keys (function keys, arrow keys with modifiers)
-set -g extended-keys always
-
 {{- else }}
 # Linux specific Configuration
 # ─────────────────────────
@@ -23,6 +20,9 @@ unbind C-b
 
 # Enable system clipboard integration
 set -g set-clipboard on
+
+# Always enable extended keys (function keys, arrow keys with modifiers)
+set -g extended-keys always
 
 # Allow applications to pass through escape sequences to terminal
 set -g allow-passthrough on
