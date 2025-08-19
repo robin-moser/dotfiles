@@ -49,6 +49,14 @@ HISTTIMEFORMAT="[%F %T] "
 HISTFILE=$HOME/.history
 PROMPT_COMMAND='history -a'
 
+source ~/.bash/plugins/complete_alias
+
+source ~/.bash/defaults.sh
+
+source ~/.bash/path.sh
+
+source ~/.bash/aliases.sh
+
 # try custom compiled tmux
 TMUX_BIN="$HOME/Development/repos/tmux/tmux"
 
@@ -57,14 +65,6 @@ TMUX_BIN="$HOME/Development/repos/tmux/tmux"
 
 # autostart tmux
 [[ -z $TMUX ]] && $TMUX_BIN
-
-source ~/.bash/plugins/complete_alias
-
-source ~/.bash/defaults.sh
-
-source ~/.bash/path.sh
-
-source ~/.bash/aliases.sh
 
 # load dircolors if commanad exists and file exists
 [[ -f ~/.dircolors ]] &&
