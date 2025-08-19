@@ -81,6 +81,20 @@ sudo apt install -y \
     tree colordiff zoxide dnsutils \
     fzf fd-find bat ripgrep jq yq gh \
 
+# Download zig
+tar tar xf <zig-archive.tar.xz>
+cp <zig-archive>/zig ~/.local/bin/
+rm -rf <zig-archive.tar.xz> <zig-archive>
+
+# Compile Ghostty
+sudo apt install -y \
+    libgtk-4-dev libadwaita-1-dev blueprint-compiler \
+    gettext libxml2-utils libgtk4-layer-shell-dev
+
+git clone https://github.com/ghostty-org/ghostty ~/Development/repos/ghostty
+cd ~/Development/repos/ghostty
+zig build -p $HOME/.local -Doptimize=ReleaseFast
+
 # Install pyenv
 curl -fsSL https://pyenv.run | bash
 
