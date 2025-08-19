@@ -117,7 +117,7 @@
 
   ignore = "!echo -e '# UNTRACKED FILES' >> .gitignore; git status | grep -P \"^\\t\" | grep -vF .gitignore | sed \"s/^\\t//\" >> .gitignore"
 
-	open = "!openrepo(){ open $(git remote get-url ${1:-origin} | gsed -e's/git@/http:\\/\\//' -e's/\\.git$//' | gsed -E 's/(\\/\\/[^:]*):/\\1\\//')/tree/$(git symbolic-ref --quiet --short HEAD )/$(git rev-parse --show-prefix);}; openrepo"
+	open = "!openrepo(){ open $(git remote get-url ${1:-origin} | sed -e's/git@/http:\\/\\//' -e's/\\.git$//' | sed -E 's/(\\/\\/[^:]*):/\\1\\//')/tree/$(git symbolic-ref --quiet --short HEAD )/$(git rev-parse --show-prefix);}; openrepo"
 
   ### reset & undo ###
 
