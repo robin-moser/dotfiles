@@ -23,6 +23,7 @@ alias _fgrep='fgrep'
 alias _egrep='egrep'
 
 alias fd='fdfind'
+alias bat='batcat'
 
 {{- end }}
 
@@ -204,11 +205,12 @@ cst_kubectl_diff() {
 # Fuzzy file finder with preview using bat
 cst_fuzzy_vim() {
     local fl
+    bat="$(type -P bat || type -P batcat)"
     fl=$(fd -H --type f --color always \
         --exclude .git --exclude node_modules --exclude __pycache__ \
         --exclude .next --exclude venv \
         -- . "$@" |
-        fzf --preview "bat {} --pager=never --color=always \
+        fzf --preview "$bat {} --pager=never --color=always \
         --style=changes,header,grid,snip" --margin 1%)
 
     if test -n "$fl"; then
