@@ -3,10 +3,10 @@
   "theme": "tokyonight",
   "keybinds": {
     "leader": "ctrl+d",
-    "input_newline": "shift+enter",
-    "messages_previous": "ctrl+h",
-    "messages_next": "ctrl+l",
+    "input_newline": "shift+return",
     "messages_half_page_up": "ctrl+k",
-    "messages_half_page_down": "ctrl+j"
+    "messages_half_page_down": "linefeed",
+    "session_child_cycle": "none",
+    "session_child_cycle_reverse": "none"
   }
 }
