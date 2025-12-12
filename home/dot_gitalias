@@ -35,6 +35,7 @@
 
   dc = diff --cached
   dw = diff --color-words='[^[:space:]]|([[:alnum:]]|UTF_8_GUARD)+' --color
+  ds = "!GIT_EXTERNAL_DIFF='difft --skip-unchanged' git diff"
 
   ### clean ###
 

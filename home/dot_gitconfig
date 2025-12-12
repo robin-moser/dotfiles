@@ -47,3 +47,10 @@
 
 [push]
     autoSetupRemote = true
+
+[diff]
+	tool = nvimdiff
+
+[difftool "nvimdiff"]
+    # overwrite default to open file in read-write permission
+    cmd = nvim -f -d -c 'wincmd l' -c 'cd $GIT_PREFIX' "$LOCAL" "$REMOTE"

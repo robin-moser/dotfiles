@@ -50,3 +50,12 @@ vim.api.nvim_create_autocmd("BufWritePre", {
     vim.fn.winrestview(save)
   end,
 })
+
+-- Auto close all buffers if one buffer is closed in diff view
+vim.api.nvim_create_autocmd("QuitPre", {
+  callback = function()
+    if vim.wo.diff then
+      vim.cmd("qall")
+    end
+  end,
+})
