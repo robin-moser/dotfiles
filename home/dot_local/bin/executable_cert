@@ -1,0 +1,264 @@
+#!/usr/bin/env bash
+
+# cert: inspect TLS certificates from files or servers
+#
+# Usage:
+#   cert file [options] [path]          Read certificate from file (stdin if omitted)
+#   cert server [options] host[:port]   Connect to TLS server (default port 443)
+#
+# Options:
+#   -a  Show entire certificate chain
+
+RED='\033[1;31m'
+YELLOW='\033[1;33m'
+GREEN='\033[1;32m'
+BLUE='\033[1;34m'
+MAGENTA='\033[1;35m'
+WHITE='\033[1;37m'
+DIM='\033[2m'
+RESET='\033[0m'
+
+CHAIN_MODE=false
+MODE=""
+TARGET=""
+
+main() {
+    command -v openssl >/dev/null 2>&1 || { echo -e "${RED}Error: openssl required${RESET}" >&2; exit 1; }
+
+    parse_args "$@"
+
+    local cert_data
+    cert_data=$(get_cert_data)
+    [[ -z "$cert_data" ]] && { echo -e "${RED}Error: Could not read certificate data${RESET}" >&2; exit 1; }
+
+    if [[ "$CHAIN_MODE" == "true" ]]; then
+        display_chain "$cert_data"
+    else
+        display_cert "$(parse_cert_info "$cert_data")" "" "true" ""
+    fi
+}
+
+# prefer GNU date (gdate) on macOS for -d flag support
+date() {
+    if command -v gdate >/dev/null 2>&1; then
+        command gdate "$@"
+    else
+        command date "$@"
+    fi
+}
+
+# parse CLI arguments into MODE, TARGET, CHAIN_MODE
+parse_args() {
+    # print first comment block in the file as usage
+    [[ $# -eq 0 ]] && { sed -n '/^#/,/^[^#]/p' "$0" | sed '$d; s/^# \?//'; exit 1; }
+
+    case "$1" in
+        file|server) MODE="$1"; shift ;;
+        *) echo -e "${RED}Error: Invalid mode '$1'. Use 'file' or 'server'.${RESET}" >&2; exit 1 ;;
+    esac
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -a) CHAIN_MODE=true ;;
+            *) [[ -n "$TARGET" ]] && { echo -e "${RED}Error: Multiple targets specified.${RESET}" >&2; exit 1; }
+               TARGET="$1" ;;
+        esac
+        shift
+    done
+
+    [[ "$MODE" == "server" && -z "$TARGET" ]] && { echo -e "${RED}Error: Server mode requires a hostname.${RESET}" >&2; exit 1; }
+}
+
+# fetch certificate from file or server
+get_cert_data() {
+    if [[ "$MODE" == "file" ]]; then
+        if [[ "$CHAIN_MODE" == "true" ]]; then
+            if [[ -n "$TARGET" ]]; then cat "$TARGET"; else cat; fi
+        else
+            if [[ -n "$TARGET" ]]; then
+                timeout 5 openssl x509 -in "$TARGET" -noout -text 2>/dev/null
+            else
+                timeout 5 openssl x509 -noout -text 2>/dev/null
+            fi
+        fi
+    else
+        local host="${TARGET%%:*}"
+        local port="${TARGET##*:}"
+        [[ "$host" == "$port" ]] && port=443
+
+        if [[ "$CHAIN_MODE" == "true" ]]; then
+            timeout 10 bash -c "echo | openssl s_client -connect '$host:$port' -servername '$host' -showcerts 2>/dev/null"
+        else
+            timeout 10 bash -c "echo | openssl s_client -connect '$host:$port' -servername '$host' 2>/dev/null | openssl x509 -noout -text 2>/dev/null"
+        fi
+    fi
+}
+
+# extract subject, issuer, dates, SANs from openssl text output
+parse_cert_info() {
+    local cert_text="$1"
+    local subject issuer not_before not_after sans cn
+
+    subject=$(echo "$cert_text" | grep "Subject:" | sed 's/.*Subject: //')
+    issuer=$(echo "$cert_text" | grep "Issuer:" | sed 's/.*Issuer: //')
+    not_before=$(echo "$cert_text" | grep "Not Before:" | sed 's/.*Not Before: //')
+    not_after=$(echo "$cert_text" | grep "Not After :" | sed 's/.*Not After : //')
+    sans=$(echo "$cert_text" | awk '/X509v3 Subject Alternative Name:/{getline; print}' | sed 's/DNS://g; s/, */ /g' | xargs)
+
+    [[ "$subject" =~ CN=([^,]+) ]] && cn="${BASH_REMATCH[1]}"
+
+    printf '%s\n' "subject:${subject}" "issuer:${issuer}" "not_before:${not_before}" "not_after:${not_after}" "sans:${sans}" "cn:${cn}"
+}
+
+# return color code based on expiration
+get_expiration_color() {
+    local not_after="$1"
+    local now_epoch after_epoch
+
+    now_epoch=$(date +%s)
+    after_epoch=$(date -d "$not_after" +%s 2>/dev/null) || return
+
+    if [[ $after_epoch -lt $now_epoch ]]; then
+        echo "$RED"
+    elif [[ $((after_epoch - now_epoch)) -lt 2592000 ]]; then
+        echo "$YELLOW" # expiring within 30 days
+    else
+        echo "$GREEN"
+    fi
+}
+
+# format date string with optional color
+format_date() {
+    local date_str="$1" color="$2"
+    local formatted_date formatted_time
+
+    formatted_date=$(date -d "$date_str" "+%Y-%m-%d" 2>/dev/null || echo "$date_str")
+    formatted_time=$(date -d "$date_str" "+%H:%M:%S %Z" 2>/dev/null || echo "")
+
+    if [[ -n "$color" ]]; then
+        echo "${color}$formatted_date${RESET} $formatted_time"
+    else
+        echo "${WHITE}$formatted_date${RESET} $formatted_time"
+    fi
+}
+
+# print formatted certificate info with colors
+display_cert() {
+    local cert_info="$1" trust_status="$2" is_leaf="$3" serial="$4"
+    local subject issuer not_before not_after sans cn
+
+    while IFS=':' read -r key value; do
+        case "$key" in
+            subject) subject="$value" ;;
+            issuer) issuer="$value" ;;
+            not_before) not_before="$value" ;;
+            not_after) not_after="$value" ;;
+            sans) sans="$value" ;;
+            cn) cn="$value" ;;
+        esac
+    done <<<"$cert_info"
+
+    local exp_color date_before date_after colored_subject colored_issuer
+    exp_color=$(get_expiration_color "$not_after")
+    date_before=$(format_date "$not_before" "")
+    date_after=$(format_date "$not_after" "$exp_color")
+
+    colored_subject="$subject"
+    [[ -n "$cn" && "$is_leaf" == "true" ]] && colored_subject="${subject/CN=$cn/CN=${BLUE}$cn${RESET}}"
+
+    colored_issuer="$issuer"
+    if [[ "$issuer" =~ CN=([^,]+) ]]; then
+        local issuer_cn="${BASH_REMATCH[1]}"
+        case "$trust_status" in
+            trusted) colored_issuer="${issuer/CN=$issuer_cn/CN=${GREEN}$issuer_cn${RESET}}" ;;
+            untrusted) colored_issuer="${issuer/CN=$issuer_cn/CN=${RESET}$issuer_cn${RESET}}" ;;
+        esac
+    fi
+
+    echo -e "${MAGENTA}Subject:${RESET} $colored_subject"
+
+    if [[ -n "$sans" ]]; then
+        local colored_sans="" first=true
+        for domain in $sans; do
+            [[ "$first" == true ]] && { colored_sans+="${WHITE}$domain${RESET}"; first=false; } || colored_sans+=", ${WHITE}$domain${RESET}"
+        done
+        echo -e "${MAGENTA}Alt DNS:${RESET} $colored_sans"
+    fi
+
+    echo -e "${MAGENTA}Issuer:${RESET}  $colored_issuer"
+    [[ -n "$serial" ]] && echo -e "${MAGENTA}Serial:${RESET}  $serial"
+    echo -e "${MAGENTA}Valid:${RESET}   $date_before → $date_after"
+}
+
+# check if issuer CN is in Mozilla's trusted root CA list
+check_trust_store() {
+    local cn="$1"
+    command -v curl >/dev/null 2>&1 || { echo "unknown"; return; }
+
+    local csv
+    csv=$(timeout 10 curl -s "https://ccadb.my.salesforce-sites.com/mozilla/IncludedCACertificateReportCSVFormat" 2>/dev/null)
+
+    if [[ -n "$csv" ]]; then
+        echo "$csv" | grep -q "\"$cn\"" && echo "trusted" || echo "untrusted"
+    else
+        echo "unknown"
+    fi
+}
+
+# parse and display all certificates in a PEM chain
+display_chain() {
+    local chain_data="$1"
+    local -a cert_texts cert_pems subjects issuers
+    local cert_count=0 current_cert="" in_cert=false
+
+    # extract individual PEM certificates from chain
+    while IFS= read -r line; do
+        if [[ "$line" == *"BEGIN CERTIFICATE"* ]]; then
+            in_cert=true
+            current_cert="$line"$'\n'
+        elif [[ "$line" == *"END CERTIFICATE"* ]]; then
+            current_cert+="$line"
+            ((cert_count++))
+
+            cert_pems[cert_count]="$current_cert"
+            cert_texts[cert_count]=$(echo "$current_cert" | openssl x509 -noout -text 2>/dev/null)
+
+            current_cert=""
+            in_cert=false
+        elif [[ "$in_cert" == true ]]; then
+            current_cert+="$line"$'\n'
+        fi
+    done <<<"$chain_data"
+
+    [[ $cert_count -eq 0 ]] && { echo -e "${RED}Error: No certificates found${RESET}" >&2; return 1; }
+
+    # collect subjects/issuers to determine cert type (leaf/intermediate/root)
+    local all_subjects=""
+    for i in $(seq 1 $cert_count); do
+        local info
+        info=$(parse_cert_info "${cert_texts[$i]}")
+        subjects[i]=$(echo "$info" | grep "^subject:" | cut -d':' -f2-)
+        issuers[i]=$(echo "$info" | grep "^issuer:" | cut -d':' -f2-)
+        all_subjects+="${subjects[$i]}"$'\n'
+    done
+
+    for i in $(seq 1 $cert_count); do
+        # determine cert type: first is leaf, self-signed or issuer not in chain is root
+        local cert_type="intermediate"
+        [[ $i -eq 1 ]] && cert_type="leaf"
+        [[ "${subjects[$i]}" == "${issuers[$i]}" ]] && cert_type="root"
+        ! echo "$all_subjects" | grep -q "${issuers[$i]}" && cert_type="root"
+
+        local trust=""
+        [[ "${issuers[$i]}" =~ CN=([^,]+) ]] && trust=$(check_trust_store "${BASH_REMATCH[1]}")
+
+        local serial
+        serial=$(echo "${cert_pems[$i]}" | openssl x509 -noout -serial 2>/dev/null | cut -d'=' -f2 | sed 's/../&:/g; s/:$//')
+
+        echo -e "${DIM}Certificate $i/$cert_count ($cert_type)${RESET}"
+        display_cert "$(parse_cert_info "${cert_texts[$i]}")" "$trust" "$([[ $i -eq 1 ]] && echo true || echo false)" "$serial"
+        echo
+    done
+}
+
+main "$@"

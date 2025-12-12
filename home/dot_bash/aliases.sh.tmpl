@@ -48,7 +48,6 @@ alias k='cst_kubectl_with_yaml'
 alias kd='cst_kubectl_diff'
 alias ghsecrets='cst_gh_secrets'
 alias dotoken='cst_do_token'
-alias cert='cst_inspect_cert'
 complete -F _complete_alias d
 complete -F _complete_alias dcc
 complete -F __start_kubectl k
@@ -432,67 +431,6 @@ cst_extract_archive() {
     *.zip) unzip "$1" ;;
     *) echo "'$1' cannot be extracted via extract()" ;;
     esac
-}
-
-cst_inspect_cert() {
-    # Get certificate data
-    local cert_data
-    if [[ "$1" == "file" ]]; then
-        cert_data=$(timeout 2 openssl x509 -in "${2:-/dev/stdin}" -noout -text 2>/dev/null)
-    elif [[ "$1" == "server" ]]; then
-        local host="${2%%:*}" port="${2##*:}"
-        [[ "$host" == "$port" ]] && port=443
-        cert_data=$(timeout 2 bash -c "echo | openssl s_client -connect '$host:$port' -servername '$host' 2>/dev/null | openssl x509 -noout -text 2>/dev/null")
-    else
-        echo "Usage: cst_inspect_cert file [filename] | server host[:port]"
-        return 1
-    fi
-
-    [[ -z "$cert_data" ]] && {
-        echo -e "\033[1;31mError: Could not read certificate data (timeout or connection failed)\033[0m"
-        return 1
-    }
-
-    # Extract certificate info
-    local subject issuer not_after sans
-    subject=$(echo "$cert_data" | _grep "Subject:" | _sed 's/.*Subject: //')
-    issuer=$(echo "$cert_data" | _grep "Issuer:" | _sed 's/.*Issuer: //')
-    not_after=$(echo "$cert_data" | _grep "Not After :" | _sed 's/.*Not After : //')
-    sans=$(echo "$cert_data" | awk '/X509v3 Subject Alternative Name:/{getline; print}' | _sed 's/DNS://g; s/, / /g' | xargs)
-
-    # Check expiration status for coloring
-    local status_color="\033[1;32m" # Green default
-    if command -v gdate >/dev/null 2>&1; then
-        local now_epoch=$(gdate +%s) after_epoch=$(gdate -d "$not_after" +%s 2>/dev/null)
-        if [[ -n "$after_epoch" ]]; then
-            if [[ $after_epoch -lt $now_epoch ]]; then
-                status_color="\033[1;31m" # Red for expired
-            elif [[ $((after_epoch - now_epoch)) -lt 2592000 ]]; then
-                status_color="\033[1;33m" # Yellow for expiring soon
-            fi
-        fi
-    fi
-
-    # Format dates with colored date parts
-    local date_before date_after
-    if command -v gdate >/dev/null 2>&1; then
-        local not_before=$(echo "$cert_data" | _grep "Not Before:" | _sed 's/.*Not Before: //')
-        date_before=$(gdate -d "$not_before" "+\033[1;37m%Y-%m-%d\033[0m %H:%M:%S %Z" 2>/dev/null || echo "$not_before")
-        date_after=$(gdate -d "$not_after" "+\033[1;37m%Y-%m-%d\033[0m %H:%M:%S %Z" 2>/dev/null || echo "$not_after")
-    else
-        date_before="$not_before"
-        date_after="$not_after"
-    fi
-
-    # Color subject line after CN=
-    local colored_subject="$subject"
-    [[ "$subject" == *"CN="* ]] && colored_subject="${subject%%CN=*}CN=${status_color}${subject#*CN=}\033[0m"
-
-    # Display output
-    echo -e "\033[1;35mSubject:\033[0m $colored_subject"
-    [[ -n "$sans" ]] && echo -e "\033[1;35mAlt DNS:\033[0m $sans"
-    echo -e "\033[1;35mIssuer:\033[0m  $issuer"
-    echo -e "\033[1;35mValid:\033[0m   $date_before → $date_after"
 }
 
 # Interactive Y/N prompt with customizable default

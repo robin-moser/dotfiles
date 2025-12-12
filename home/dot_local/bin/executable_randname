@@ -1,0 +1,150 @@
+#!/usr/bin/env bash
+
+# randname: print a random word from a category
+#
+# Usage: randname [-u] [category]
+#   -u          Uppercase first letter
+#   category    One of: beans, cod-names, coffee, colors, islands, metals, painters, scientists, units (default)
+
+set -euo pipefail
+
+uppercase=false
+[[ "${1:-}" == "-u" ]] && { uppercase=true; shift; }
+
+category="${1:-units}"
+
+# pick random word from space-separated string
+get_random_word() {
+    local words_string="$1"
+    local -a words
+    read -ra words <<< "$(echo "$words_string" | tr '\n' ' ')"
+    echo "${words[$((RANDOM % ${#words[@]}))]}"
+}
+
+# word lists: mixed case ok, output is lowercased (unless -u)
+case "$category" in
+    metals)
+        words="Aluminum Barium Beryllium Bismuth Boron Calcium
+            Chromium Copper Gallium Indium Iridium Mercury Niobium
+            Palladium Platinum Potassium Radium Scandium Sodium
+            Strontium Tantalum Tellurium Thorium Titanium Tungsten
+            Uranium Vanadium Zirconium"
+        ;;
+    cod-names)
+        words="Nikolai Ozone Peasant Rook Royce Scarecrow Adler
+            Alex Allen Amsel Anatoly Archer Arem Arlington Arseni Aziz
+            Badanov Bagramyan Barkley Baron Batyuk Belinski Blackburn
+            Blake Bloomfield Bluton Bohater Booth Borodin Bowman
+            Braeburn Briarton Bricker Brock Brooks Bueller Burns
+            Callard Carlos Carlyle Carpenter Castillo Castro Chernov
+            Church Clarke Clements Coen Coffey Cole Cook Crosby
+            Daletski Davis DeFalco DeLuca Defector Delaney Dempsey
+            Denley Denny Dixon Doornink Dragovich Drew DuFontaine Dunn
+            Durasov Eaton Edrich Elder Ender Fahey Falk Farid Ferguson
+            Fluffy Foley Gaines Gary Gavrilov Gaz Gersch Ghost Gibson
+            Glover Gordon Goriss Greenwood Griffen Griggs Grinch Groph
+            Grunt Guzzo Hamed Handsome Harding Harper Harris Hassler
+            Hawkins Heath Henderson Hillen Hubert Hudson Huxley Ingram
+            Ivanov Jack Jackowickz Jackson James Janssen Johnson
+            Kamarov Kanemetzky Kaylor Keating Keirsey Keith Kelly
+            Kennedy Kerensky Kingsley Kiril Kolwalski Konstantinov
+            Koopman Koppel Koslov Kozin Kozlov Kravchenko Kuznetsov
+            LaRoche Leary Lehmkuhl Leonov Letlev Lev Lewis Locke Locke
+            Lootz Lovonski Luyties Lynch Mac MacGregor MacMillan
+            MacTavish Macey Maestas Makarov Mandlebaum Mangin Marcel
+            Markhov Marshall Martin Masaki Mason Massey Maxis McCain
+            McClane McCloskey McCord McCullin McLaughlin McNamara
+            Menendez Miller Monty Moody Mosely Myers Neitsch Neiwert
+            Nevski Nichols Noriega Norman O'Bryant O'Leary O'Neill Park
+            Parker Pavelovna Pavlov Peas Pelayo Perez Petrenko Petrov
+            Petrova Petrovitch Polonsky Posadskaya Price Puskov Pyle
+            Rambo Ramirez Randall Reznov Richtofen Riggs Riley Rivers
+            Roberts Robiechauld Robinson Roe Roebuck Roger Rojas Rojas'
+            Romanov Rosetti Roulette Rowe Roycewicz Rudinski Russman
+            Rutherford Saadak Sanderson Sandler Sandman Sasha Sat1
+            Saunders Schmitter Schuster Scully Semenov Sergey Shabs
+            Shakov Sharpe Shepherd Sims Smith Smits Sokolov Sophia
+            Spears Starkey Stavro Steiner Stuhlinger Sullivan Sumners
+            Swift Taylor Tchnerovkov Telinov Thermal Toad Tropas Truck
+            Tvelin Twohill Ulan VC Van Vanya Vasquez Vidov Vikharev
+            Viktor Volker Volok Volsky Voronin Vorshevsky Wade Walker
+            Wallcroft Weaver Webb Welsh West Westbrook Willhelm Wilson
+            Woods Worm Yared Young Yura Yuri Yusef Zaitsev Zakhaev
+            Zavoyski Zoff Zubov Zukov"
+        ;;
+    beans)
+        words="lima lentil soy pinto navy northern garbanzo kidney
+            black boston potato butter red sword locust black-eyed
+            green string stringless runner french snap fava aztec cave
+            anasazi cranberry roman romano barlotti pink cowboy refried
+            white pea baked yellow canary peruano nuña mayocoba sulphur
+            mung broad hyacinth lupin tepary winged"
+        ;;
+    islands)
+        words="Alcatraz Antigua Barbados Bermuda Cabrera
+            Cayman Corsica Cozumel Crete Cuba Dog Dragonera Easter
+            Eivissa Elba Ellis Formentera Great Britain Grenada
+            Greenland Hawaii Kauai Lanai Molokai Maui Oahu Hispaniola
+            Hokkaido Honshu Shikoku Kyushu Ibiza Iceland Ireland
+            Jamaica Java Kangaroo Krakatoa Mackinac Madagascar Mallorca
+            Menorca Malta Midway Okinawa Rikers Saipan Sardinia Sicily
+            Tasmania Tortuga Vancouver"
+        ;;
+    painters)
+        words="Boticelli Breton Dali Degas Gauguin Klimt Millet
+            Monet Picasso Rembrandt Renoir Rubens"
+        ;;
+    scientists)
+        words="Aryabhata Abel Banach Bertrand Birkhoff Bourbaki
+            Brahmagupta Cantor Cauchy Dedekind Descartes Dirichlet
+            Euler Fermat Fourier Fraenkel Frobenius Galois Gauss Hardy
+            Herstein Hilbert Jordan Kolmogorov Kronecker Kummer
+            Lagrange Laplace Lasker Legendre Leibniz Lyapunov
+            Mandelbrot Noether Pascal Peano Poisson Ramanujan Riemann
+            Sobolev Stoker Sylvester Toeplitz Turing Weierstrass Weil
+            Wiener Zermelo Zorn"
+        ;;
+    units)
+        words="ampere angstrom bar barleycorn becquerel byte
+            candela canthare carat clove coulomb crith cubit curie
+            cyclone darc darcy denier farad fathom femtobarn gram hank
+            hectare hertz hobbema joule kelvin knot league lumen meter
+            newton ohm parsec pascal point roentgen second shake siege
+            sievert sverdrup tesla tessera volt watt"
+        ;;
+    colors)
+        words="red green blue yellow orange purple pink black white
+            gray brown cyan magenta teal violet olive maroon navy
+            turquoise gold silver indigo lime coral plum salmon beige
+            ivory taupe chartreuse mauve peach lavender periwinkle sage
+            aquamarine crimson fuchsia emerald ruby amethyst topaz
+            pearl jade sapphire onyx opal rose iris carnation azure
+            buttercup cherry copper ebony garnet ginger hazel indigo
+            jade lemon lilac magenta mandarin peacock poppy ruby
+            saffron sapphire scarlet sepia sienna tangerine teal
+            vermillion violet amaranth carmine cerulean crimson
+            dandelion emerald lapis moss plum raspberry tawny sky
+            zinnwaldite"
+        ;;
+    coffee)
+        words="Arusha Benguet Bergendal Bernardina Bourbon Catuai
+            Catimor Caturra Charrier Chiroso Harar Sidamo Yirgacheffe
+            Geisha Bonifieur Kona Java Maragogipe Maracaturra Mayaguez
+            Mocha Pacamara Pacas Sagada Santos Sarchimor Mandheling
+            Lintong Timor Arabusta Typica Bugishu Brutte Starmaya
+            Barako Stenophylla"
+        ;;
+    *)
+        echo "Unknown category '$category'. Available: beans, cod-names, coffee, colors, islands, metals, painters, scientists, units" >&2
+        exit 1
+        ;;
+esac
+
+random_word=$(get_random_word "$words")
+random_word=$(echo "$random_word" | tr '[:upper:]' '[:lower:]')
+
+if [[ "$uppercase" == true ]]; then
+    random_word="$(echo "${random_word:0:1}" | tr '[:lower:]' '[:upper:]')${random_word:1}"
+fi
+
+echo "$random_word"

@@ -1,0 +1,192 @@
+#!/usr/bin/env bash
+
+# sec: Bitwarden secrets cache with GPG encryption
+#
+# Usage:
+#   sec sync            Sync from Bitwarden into local GPG cache
+#   sec list            List all available keys
+#   sec get <key>       Print value (generates TOTP for 2FA keys)
+#   sec <cmd> [args]    Run command with <key> placeholders expanded
+
+set -euo pipefail
+
+GPG_RECIPIENT="mail@robinmoser.de"
+CACHE_PATH="${SEC_CACHE:-$HOME/.cache/sec/secrets.json.gpg}"
+JSON=""
+
+err() { printf 'sec: %s\n' "$*" >&2; }
+
+# create cache directory if missing
+ensure_cache_dir() {
+    local dir
+    dir=$(dirname "$CACHE_PATH")
+    [[ -d "$dir" ]] || mkdir -p "$dir"
+}
+
+# decrypt and cache JSON in memory
+load_cache() {
+    [[ -n "$JSON" ]] && return 0
+    [[ -f "$CACHE_PATH" ]] || { err "cache not found; run 'sec sync' first"; return 1; }
+    JSON=$(gpg --quiet --decrypt "$CACHE_PATH") || { err "failed to decrypt cache"; return 1; }
+}
+
+# get value from cached JSON by key
+get_value() {
+    printf '%s' "$JSON" | jq -r --arg k "$1" 'if has($k) then .[$k] else empty end'
+}
+
+# generate TOTP code from secret (RFC 6238)
+generate_totp() {
+    local input="$1"
+    local secret secret_hex time_hex hmac offset code
+
+    if [[ "$input" == otpauth://* ]]; then
+        secret=$(echo "$input" | sed -n 's/.*secret=\([^&]*\).*/\1/p')
+    else
+        secret="$input"
+    fi
+    [[ -z "$secret" ]] && return 1
+
+    # RFC 6238 TOTP: extract secret, compute HMAC-SHA1, truncate to 6 digits
+    secret_hex=$(echo "$secret" | base32 -d 2>/dev/null | xxd -p | tr -d '\n')
+    [[ -z "$secret_hex" ]] && return 1
+
+    time_hex=$(printf '%016x' $(($(date +%s) / 30)))
+    hmac=$(echo -n "$time_hex" | xxd -r -p | openssl dgst -sha1 -mac HMAC -macopt hexkey:"$secret_hex" 2>/dev/null | awk '{print $NF}')
+    [[ -z "$hmac" ]] && return 1
+
+    offset=$((0x${hmac:39:1} * 2))
+    code=$(((0x${hmac:$offset:8} & 0x7fffffff) % 1000000))
+    printf "%06d\n" "$code"
+}
+
+# login/unlock Bitwarden and export BW_SESSION
+ensure_bw_session() {
+    if [[ -n "${BW_SESSION:-}" ]] && bw status --session "$BW_SESSION" --raw >/dev/null 2>&1; then
+        export BW_SESSION
+        return 0
+    fi
+
+    local status st
+    status=$(bw status --raw 2>/dev/null) || { err "bw status failed"; return 1; }
+    st=$(printf '%s' "$status" | jq -r '.status // ""' 2>/dev/null || echo "")
+
+    case "$st" in
+        unauthenticated|"") err "running 'bw login'"; bw login || { err "bw login failed"; return 1; } ;;
+    esac
+
+    err "running 'bw unlock'"
+    local token
+    token=$(bw unlock --raw)
+    [[ -z "$token" ]] && { err "bw unlock failed"; return 1; }
+
+    BW_SESSION="$token"
+    export BW_SESSION
+}
+
+# extract <cli:key:field> tags from Bitwarden notes into JSON
+build_json() {
+    # fields: User, Pass, Website, 2FA, or custom field name
+    bw list items --session "$BW_SESSION" --raw | jq -r '
+        def cli_pairs:
+            select(.notes != null and (.notes | contains("<cli:"))) as $item
+            | ($item.notes | split("\n"))[]
+            | select(startswith("<cli:") and endswith(">"))
+            | capture("^<cli:(?<key>[^:>]+):(?<field>[^>]+)>") as $m
+            | $m.key as $k | $m.field as $f
+            | if $f == "User" then
+                if $item.login.username != null then [$k, $item.login.username] else empty end
+              elif $f == "Pass" then
+                if $item.login.password != null then [$k, $item.login.password] else empty end
+              elif $f == "Website" then
+                if ($item.login.uris | length) > 0 then [$k, $item.login.uris[0].uri] else empty end
+              elif $f == "2FA" then
+                if $item.login.totp != null then [$k, $item.login.totp] else empty end
+              else
+                ($item.fields // [] | map(select(.name == $f)) | .[0]?) as $cf
+                | if $cf != null then [$k, $cf.value] else empty end
+              end;
+        [.[] | select(.notes != null and (.notes | contains("<cli:"))) | cli_pairs]
+        | reduce .[] as $p ({}; .[$p[0]] = $p[1])
+    '
+}
+
+# sync Bitwarden vault and update encrypted cache
+cmd_sync() {
+    ensure_cache_dir
+    ensure_bw_session || return 1
+
+    err "syncing vault"
+    bw sync --session "$BW_SESSION" >/dev/null || { err "bw sync failed"; return 1; }
+
+    local tmp="${CACHE_PATH}.tmp.$$"
+    build_json | gpg --quiet --encrypt --recipient "$GPG_RECIPIENT" --output "$tmp" || {
+        err "failed to encrypt cache"
+        rm -f "$tmp" 2>/dev/null
+        return 1
+    }
+
+    mv -f "$tmp" "$CACHE_PATH"
+    JSON=""
+    err "cache updated at $CACHE_PATH"
+}
+
+# list all available keys
+cmd_list() {
+    load_cache || return 1
+    printf '%s' "$JSON" | jq -r 'keys[]' | sort
+}
+
+# get value by key, auto-generate TOTP for 2FA keys
+cmd_get() {
+    local key="$1"
+    load_cache || return 1
+
+    local value
+    value=$(get_value "$key")
+    [[ -z "$value" ]] && { err "key not found: $key"; return 1; }
+
+    if [[ "$value" == otpauth://* || "$key" == *-2fa || "$key" == *-totp ]]; then
+        local code
+        code=$(generate_totp "$value") && { echo "$code"; return 0; }
+    fi
+
+    echo "$value"
+}
+
+# run command with <key> placeholders expanded
+cmd_run() {
+    load_cache || return 1
+
+    local -a cmd=("$@")
+    local i arg keys key value
+
+    for i in "${!cmd[@]}"; do
+        arg="${cmd[$i]}"
+        keys=$(printf '%s' "$arg" | grep -oE '<[a-z0-9_-]+>' | sed 's/^<//;s/>$//' | sort -u) || true
+
+        for key in $keys; do
+            value=$(get_value "$key")
+            [[ -z "$value" ]] && { err "key not found: $key"; return 1; }
+
+            if [[ "$value" == otpauth://* ]]; then
+                value=$(generate_totp "$value") || { err "TOTP failed for $key"; return 1; }
+            fi
+
+            arg="${arg//<$key>/$value}"
+        done
+        cmd[i]="$arg"
+    done
+
+    exec "${cmd[@]}"
+}
+
+# print first comment block as usage
+[[ $# -eq 0 ]] && { sed -n '/^#/,/^[^#]/p' "$0" | sed '$d; s/^# \?//'; exit 1; }
+
+case "$1" in
+    sync) shift; [[ $# -eq 0 ]] || { err "sync takes no arguments"; exit 1; }; cmd_sync ;;
+    list) shift; [[ $# -eq 0 ]] || { err "list takes no arguments"; exit 1; }; cmd_list ;;
+    get)  shift; [[ $# -eq 1 ]] || { err "usage: sec get <key>"; exit 1; }; cmd_get "$1" ;;
+    *)    cmd_run "$@" ;;
+esac
