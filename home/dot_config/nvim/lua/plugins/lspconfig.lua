@@ -15,8 +15,29 @@ return {
               completion = true,
               validate = true,
               schemas = {
-                [require("kubernetes").yamlls_schema()] = "*.yaml",
-                ["http://json.schemastore.org/github-workflow"] = ".github/workflows/*",
+                -- kubernetes schema
+                [require("kubernetes").yamlls_schema()] = {
+                  -- k8s directories
+                  "manifests/**/*.{yml,yaml}",
+                  "kubernetes/**/*.{yml,yaml}",
+                  "k8s/**/*.{yml,yaml}",
+                  -- single k8s definition files
+                  "*kubernetes*.{yml,yaml}",
+                  "*k8s*.{yml,yaml}",
+                },
+                -- k8s kustomize schema
+                ["https://www.schemastore.org/kustomization.json"] = {
+                  "kustomization.{yml,yaml}",
+                },
+                -- github workflow schema
+                ["https://www.schemastore.org/github-workflow"] = {
+                  ".github/workflows/*",
+                },
+                -- resticprofile schema
+                ["https://creativeprojects.github.io/resticprofile/jsonschema/config.json"] = {
+                  "restic/*.yaml",
+                  "resticprofile/*.yaml",
+                },
               },
             },
           },

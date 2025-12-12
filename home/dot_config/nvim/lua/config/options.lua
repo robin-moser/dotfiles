@@ -69,6 +69,8 @@ local options = {
   writebackup = false,
   -- Don't save undo history
   undofile = false,
+  -- Enable project-local .nvimrc files
+  exrc = true,
 
   -- Decrease update time
   updatetime = 250,
