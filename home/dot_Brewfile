@@ -16,10 +16,12 @@ brew "keyring"                            # Easy way to access the system keyrin
 brew "msoap/tools/shell2http"             # Executing shell commands via simple http server
 brew "qrencode"                           # QR Code generation
 brew "restic"                             # Fast, efficient and secure backup program
+brew "creativeprojects/tap/resticprofile" # Configuration profiles manager for restic
 brew "stress"                             # Tool to impose load on and stress test a computer system
 brew "tldr"                               # Simplified and community-driven man pages
 brew "tty-clock"                          # Digital clock in ncurses
 brew "viddy"                              # Modern watch command
+brew "wakeonlan"                          # Sends magic packets to wake up network-devices
 brew "watch"                              # Executes a program periodically, showing output fullscreen
 cask "anki"                               # Memory training application
 cask "bartender"                          # Menu bar icon organiser
@@ -46,6 +48,7 @@ cask "ungoogled-chromium"                 # Chromium browser without Google inte
 
 # Version Control & Git Tools
 brew "gh"                                 # GitHub command-line tool
+brew "difftastic"                         # Structural diff that understands syntax
 brew "git-delta"                          # Syntax-highlighting pager for git and diff output
 brew "git"                                # Distributed revision control system
 brew "lazygit"                            # Simple terminal UI for git commands
@@ -54,6 +57,7 @@ brew "tig"                                # Text interface for Git repositories
 # Cloud & DevOps Tools
 brew "ansible"                            # Automate deployment, configuration, and upgrading
 brew "awscli"                             # Official Amazon AWS command-line interface
+brew "hcloud"                             # Command-line interface for Hetzner Cloud
 brew "dive"                               # Tool for exploring each layer in a docker image
 brew "fluxcd/tap/flux"                    # Flux CLI
 brew "helm"                               # Kubernetes package manager
@@ -88,6 +92,7 @@ brew "pyenv"                              # Python version management
 brew "rustup"                             # Rust toolchain installer
 brew "shellcheck"                         # Static analysis and lint tool, for (ba)sh scripts
 brew "shfmt"                              # Autoformat shell script source code
+brew "typst"                              # Markup-based typesetting system
 brew "sst/tap/opencode"                   # The AI coding agent built for the terminal.
 brew "vim"                                # Vi 'workalike' with many additional features
 brew "yarn"                               # JavaScript package manager
@@ -95,6 +100,7 @@ cask "vscodium"                           # Binary releases of VS Code without M
 
 # File Management & Cloud Storage
 brew "b2-tools"                           # B2 Cloud Storage Command-Line Tools
+brew "gromgit/fuse/bindfs-mac"            # FUSE filesystem for mirroring directories
 brew "rsync"                              # Utility that provides fast incremental file transfer
 cask "appcleaner"                         # Application uninstaller
 cask "betterzip"                          # Utility to create and modify archives
@@ -118,6 +124,7 @@ brew "pngcrush"                           # Optimizer for PNG files
 brew "poppler"                            # PDF rendering library (based on the xpdf-3.0 code base)
 brew "tesseract"                          # OCR (Optical Character Recognition) engine
 brew "vips"                               # Image processing library
+brew "scdl"                               # Soundcloud music downloader
 brew "yt-dlp"                             # Feature-rich command-line audio/video downloader
 cask "iina"                               # Free and open-source media player
 cask "netdownloadhelpercoapp"             # Allows video downloads from the Web
@@ -189,6 +196,7 @@ brew "ncdu"                               # NCurses Disk Usage
 brew "procs"                              # Modern replacement for ps written in Rust
 brew "pstree"                             # Show ps output as a tree
 brew "ripgrep"                            # Search tool like grep and The Silver Searcher
+brew "homeport/tap/termshot"              # Creates screenshots from terminal output
 brew "tmux"                               # Terminal multiplexer
 brew "tree"                               # Display directories as trees (with optional color/HTML output)
 brew "util-linux"                         # Collection of Linux utilities
