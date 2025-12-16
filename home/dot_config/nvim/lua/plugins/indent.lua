@@ -11,6 +11,7 @@ return {
       indent = {
         tab_char = "├",
       },
+      scope = { enabled = false },
     },
   },
 }
