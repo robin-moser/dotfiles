@@ -49,6 +49,9 @@ HISTTIMEFORMAT="[%F %T] "
 HISTFILE=$HOME/.history
 PROMPT_COMMAND='history -a'
 
+AW_HISTORY_BUCKET=aw-watcher-shell_Robins-MBP.home
+AW_HISTORY_DAYS=365
+
 source ~/.bash/plugins/complete_alias
 
 source ~/.bash/defaults.sh
@@ -97,3 +100,6 @@ fi
 if command -v zoxide 1>/dev/null 2>&1; then
     eval "$(zoxide init bash --cmd cd)"
 fi
+
+# soure custom autocomplete scripts
+source ~/.bash/autocomplete.sh

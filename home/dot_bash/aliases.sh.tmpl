@@ -312,18 +312,24 @@ cst_parse_git_branch() {
 
 # Format and colorize command history output
 cst_format_history() {
-    history | awk '
-    BEGIN {
-    # FPAT = "([[:space:]]*[^[:space:]]+)";
-    # OFS = "";
-}
-{
-    $1 = "\033[2;33m" $1 "\033[0m";
-    $2 = "\033[90m" $2 "\033[0m";
-    $3 = "\033[90m" $3 "\033[0m";
-    print
-}
-' | less -rn +G
+    if [[ -n "$1" ]]; then
+        tail -n $((3 * $1)) "$HISTFILE" |
+            grep -v "^#[0-9]\{10\}$" |
+            uniq | tail -n "$1"
+    else
+        history | awk '
+            BEGIN {
+                # FPAT = "([[:space:]]*[^[:space:]]+)";
+                # OFS = "";
+            }
+            {
+                $1 = "\033[2;33m" $1 "\033[0m";
+                $2 = "\033[90m" $2 "\033[0m";
+                $3 = "\033[90m" $3 "\033[0m";
+                print
+            }
+        ' | less -rn +G
+    fi
 }
 
 # Enhanced which command that shows aliases and functions
