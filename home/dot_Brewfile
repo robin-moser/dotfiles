@@ -1,14 +1,17 @@
 # Brewfile
 
+tap "anomalyco/tap"
 tap "deskflow/tap"
 tap "fluxcd/tap"
+tap "gromgit/fuse"
+tap "kismetwireless/kismet"
 tap "msoap/tools"
 tap "oven-sh/bun"
-tap "sst/tap"
 tap "wpscanteam/tap"
 
 # Productivity & Utilities
 brew "brightness"                         # Change macOS display brightness from the command-line
+brew "creativeprojects/tap/resticprofile" # Configuration profiles manager for restic
 brew "fend"                               # Arbitrary-precision unit-aware calculator
 brew "figlet"                             # Banner-like program prints strings as ASCII art
 brew "fswatch"                            # Monitor a directory for changes and run a shell command
@@ -16,7 +19,6 @@ brew "keyring"                            # Easy way to access the system keyrin
 brew "msoap/tools/shell2http"             # Executing shell commands via simple http server
 brew "qrencode"                           # QR Code generation
 brew "restic"                             # Fast, efficient and secure backup program
-brew "creativeprojects/tap/resticprofile" # Configuration profiles manager for restic
 brew "stress"                             # Tool to impose load on and stress test a computer system
 brew "tldr"                               # Simplified and community-driven man pages
 brew "tty-clock"                          # Digital clock in ncurses
@@ -30,6 +32,7 @@ cask "hazeover"                           # Windows manager and desktop organise
 cask "karabiner-elements"                 # Keyboard customiser
 cask "mark-text"                          # Markdown editor
 cask "mqtt-explorer"
+cask "opencode-desktop"                   # OpenCode desktop GUI
 cask "paletro"                            # Command palette in any application
 cask "quicklook-json"                     # Quick Look plugin for JSON files
 cask "raycast"                            # Control your tools with a few keystrokes
@@ -42,6 +45,7 @@ cask "vienna"                             # RSS and Atom reader
 cask "chatgpt"                            # OpenAI's official ChatGPT desktop app
 cask "discord"                            # Voice and text chat software
 cask "firefox"                            # Web browser
+cask "mattermost"                         # Open-source team messaging platform
 cask "microsoft-teams"                    # Meet, chat, call, and collaborate in just one place
 cask "signal"                             # Instant messaging application focusing on security
 cask "ungoogled-chromium"                 # Chromium browser without Google integration
@@ -57,9 +61,9 @@ brew "tig"                                # Text interface for Git repositories
 # Cloud & DevOps Tools
 brew "ansible"                            # Automate deployment, configuration, and upgrading
 brew "awscli"                             # Official Amazon AWS command-line interface
-brew "hcloud"                             # Command-line interface for Hetzner Cloud
 brew "dive"                               # Tool for exploring each layer in a docker image
 brew "fluxcd/tap/flux"                    # Flux CLI
+brew "hcloud"                             # Command-line interface for Hetzner Cloud
 brew "helm"                               # Kubernetes package manager
 brew "helmfile"                           # Deploy Kubernetes Helm Charts
 brew "k9s"                                # Kubernetes CLI To Manage Your Clusters In Style!
@@ -76,6 +80,7 @@ brew "rainfrog"                           # Database management TUI for PostgreS
 cask "db-browser-for-sqlite"              # Browser for SQLite databases
 
 # Development Tools & Programming Languages
+brew "anomalyco/tap/opencode"             # AI coding assistant (OpenCode CLI)
 brew "ccls"                               # C/C++/ObjC language server
 brew "clang-format"                       # Formatting tools for C, C++, Obj-C, Java, JavaScript, TypeScript
 brew "cmake"                              # Cross-platform make
@@ -83,6 +88,7 @@ brew "composer"                           # Dependency Manager for PHP
 brew "doxygen"                            # Generate documentation for several programming languages
 brew "gcc"                                # GNU compiler collection
 brew "go"                                 # Open source programming language to build simple/reliable/efficient software
+brew "lf"                                 # Terminal file manager
 brew "n"                                  # Node version management
 brew "neovim"                             # Ambitious Vim-fork focused on extensibility and agility
 brew "oven-sh/bun/bun"                    # Incredibly fast JavaScript runtime, bundler, transpiler and package manager - all in one.
@@ -93,7 +99,6 @@ brew "rustup"                             # Rust toolchain installer
 brew "shellcheck"                         # Static analysis and lint tool, for (ba)sh scripts
 brew "shfmt"                              # Autoformat shell script source code
 brew "typst"                              # Markup-based typesetting system
-brew "sst/tap/opencode"                   # The AI coding agent built for the terminal.
 brew "vim"                                # Vi 'workalike' with many additional features
 brew "yarn"                               # JavaScript package manager
 cask "vscodium"                           # Binary releases of VS Code without MS branding/telemetry/licensing
@@ -104,6 +109,7 @@ brew "gromgit/fuse/bindfs-mac"            # FUSE filesystem for mirroring direct
 brew "rsync"                              # Utility that provides fast incremental file transfer
 cask "appcleaner"                         # Application uninstaller
 cask "betterzip"                          # Utility to create and modify archives
+cask "macfuse"                            # FUSE for macOS (required by FUSE-based filesystems)
 cask "nextcloud"                          # Desktop sync client for Nextcloud software products
 cask "synology-drive"                     # Sync and backup service to Synology NAS drives
 
@@ -112,6 +118,7 @@ brew "nut"                                # Network UPS Tools: Support for vario
 brew "smartmontools"                      # SMART hard drive monitoring
 cask "altserver"                          # iOS App Store alternative
 cask "raspberry-pi-imager"                # Imaging utility to install operating systems to a microSD card
+cask "utm"                                # Virtual machines for Mac using QEMU/Apple Virtualization
 
 # Multimedia & File Processing
 brew "atomicparsley"                      # MPEG-4 command-line tool
@@ -120,15 +127,19 @@ brew "ffmpeg"                             # Play, record, convert, and stream au
 brew "ghostscript"                        # Interpreter for PostScript and PDF
 brew "id3v2"                              # Command-line editor
 brew "imagemagick"                        # Tools and libraries to manipulate images in many formats
+brew "pandoc"                             # Universal document format converter
 brew "pngcrush"                           # Optimizer for PNG files
 brew "poppler"                            # PDF rendering library (based on the xpdf-3.0 code base)
+brew "scdl"                               # Soundcloud music downloader
 brew "tesseract"                          # OCR (Optical Character Recognition) engine
 brew "vips"                               # Image processing library
-brew "scdl"                               # Soundcloud music downloader
 brew "yt-dlp"                             # Feature-rich command-line audio/video downloader
+cask "basictex"                           # Minimal MacTeX distribution for TeX/LaTeX typesetting
 cask "iina"                               # Free and open-source media player
 cask "netdownloadhelpercoapp"             # Allows video downloads from the Web
 cask "qbittorrent"                        # Peer to peer Bitorrent client
+cask "quarto"                             # Scientific and technical publishing system (uses Pandoc + TeX)
+cask "skim"                               # PDF reader and annotator (great with TeX output)
 
 # Networking & Security Tools
 brew "bettercap"                          # Swiss army knife for network attacks and monitoring
@@ -189,6 +200,7 @@ brew "gnu-sed"                            # GNU implementation of the famous str
 brew "gnu-tar"                            # GNU version of the tar archiving utility
 brew "gnuplot"                            # Command-driven, interactive function plotting
 brew "grep"                               # GNU grep, egrep and fgrep
+brew "homeport/tap/termshot"              # Creates screenshots from terminal output
 brew "htop"                               # Improved top (interactive process viewer)
 brew "jc"                                 # Serializes the output of command-line tools to structured JSON output
 brew "jq"                                 # Lightweight and flexible command-line JSON processor
@@ -196,7 +208,6 @@ brew "ncdu"                               # NCurses Disk Usage
 brew "procs"                              # Modern replacement for ps written in Rust
 brew "pstree"                             # Show ps output as a tree
 brew "ripgrep"                            # Search tool like grep and The Silver Searcher
-brew "homeport/tap/termshot"              # Creates screenshots from terminal output
 brew "tmux"                               # Terminal multiplexer
 brew "tree"                               # Display directories as trees (with optional color/HTML output)
 brew "util-linux"                         # Collection of Linux utilities
@@ -205,8 +216,8 @@ brew "xq"                                 # Command-line XML and HTML beautifier
 brew "yq"                                 # Process YAML, JSON, XML, CSV and properties documents from the CLI
 
 # Terminals & Shell Tools
-brew "bash"                               # Bourne-Again SHell, a UNIX command interpreter
 brew "bash-completion@2"                  # Programmable completion for Bash 4.2+
+brew "bash"                               # Bourne-Again SHell, a UNIX command interpreter
 brew "chezmoi"                            # Manage your dotfiles across multiple diverse machines, securely
 brew "zoxide"                             # Shell extension to navigate your filesystem faster
 cask "ghostty"                            # Terminal emulator that uses platform-native UI and GPU acceleration
