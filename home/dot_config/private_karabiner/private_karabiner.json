@@ -157,6 +157,7 @@
                     },
                     {
                         "description": "Double Alt: open timetracking modal",
+                        "enabled": false,
                         "manipulators": [
                             {
                                 "conditions": [
@@ -202,6 +203,150 @@
                                         }
                                     ]
                                 },
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Triple Alt: toggle quick close",
+                        "manipulators": [
+                            {
+                                "conditions": [
+                                    {
+                                        "expression": "right_option_x2_expiration > system.now.milliseconds",
+                                        "type": "expression_if"
+                                    },
+                                    {
+                                        "name": "quick_close_active",
+                                        "type": "variable_if",
+                                        "value": 0
+                                    }
+                                ],
+                                "description": "3rd press (activate quick close)",
+                                "from": {
+                                    "key_code": "right_option",
+                                    "modifiers": { "optional": ["any"] }
+                                },
+                                "to": [
+                                    {
+                                        "set_variable": {
+                                            "name": "quick_close_active",
+                                            "value": 1
+                                        }
+                                    },
+                                    { "shell_command": "say \"quick-close aktiv\"" },
+                                    { "key_code": "vk_none" }
+                                ],
+                                "type": "basic"
+                            },
+                            {
+                                "conditions": [
+                                    {
+                                        "expression": "right_option_x2_expiration > system.now.milliseconds",
+                                        "type": "expression_if"
+                                    },
+                                    {
+                                        "name": "quick_close_active",
+                                        "type": "variable_if",
+                                        "value": 1
+                                    }
+                                ],
+                                "description": "3rd press (deactivate quick close)",
+                                "from": {
+                                    "key_code": "right_option",
+                                    "modifiers": { "optional": ["any"] }
+                                },
+                                "to": [
+                                    {
+                                        "set_variable": {
+                                            "name": "quick_close_active",
+                                            "value": 0
+                                        }
+                                    },
+                                    { "shell_command": "say \"quick-close inaktiv\"" },
+                                    { "key_code": "vk_none" }
+                                ],
+                                "type": "basic"
+                            },
+                            {
+                                "conditions": [
+                                    {
+                                        "expression": "right_option_x1_expiration > system.now.milliseconds",
+                                        "type": "expression_if"
+                                    }
+                                ],
+                                "description": "2nd press - sets expiration for 3rd",
+                                "from": {
+                                    "key_code": "right_option",
+                                    "modifiers": { "optional": ["any"] }
+                                },
+                                "to": [
+                                    {
+                                        "set_variable": {
+                                            "expression": "system.now.milliseconds + 300",
+                                            "name": "right_option_x2_expiration"
+                                        }
+                                    },
+                                    { "key_code": "vk_none" }
+                                ],
+                                "type": "basic"
+                            },
+                            {
+                                "description": "1st press - sets expiration for 2nd",
+                                "from": {
+                                    "key_code": "right_option",
+                                    "modifiers": { "optional": ["any"] }
+                                },
+                                "to": [
+                                    {
+                                        "set_variable": {
+                                            "expression": "system.now.milliseconds + 300",
+                                            "name": "right_option_x1_expiration"
+                                        }
+                                    },
+                                    { "key_code": "right_option" }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Quick Close: fn hides front app",
+                        "manipulators": [
+                            {
+                                "conditions": [
+                                    {
+                                        "name": "quick_close_active",
+                                        "type": "variable_if",
+                                        "value": 1
+                                    }
+                                ],
+                                "from": {
+                                    "key_code": "fn",
+                                    "modifiers": { "optional": ["any"] }
+                                },
+                                "to": [{ "shell_command": "osascript -e 'tell application \"System Events\" to tell (first process whose frontmost is true) to set value of attribute \"AXMinimized\" of window 1 to true'" }],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Quick Close: right-shift hides front app",
+                        "manipulators": [
+                            {
+                                "conditions": [
+                                    {
+                                        "name": "quick_close_active",
+                                        "type": "variable_if",
+                                        "value": 1
+                                    }
+                                ],
+                                "from": {
+                                    "key_code": "right_shift",
+                                    "modifiers": { "optional": ["any"] }
+                                },
+                                "to": [{ "key_code": "right_shift" }],
+                                "to_if_alone": [{ "shell_command": "osascript -e 'tell application \"System Events\" to tell (first process whose frontmost is true) to set value of attribute \"AXMinimized\" of window 1 to true'" }],
                                 "type": "basic"
                             }
                         ]
