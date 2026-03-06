@@ -110,6 +110,7 @@ alias ncdu='gdu-go'
 alias watch='viddy'
 alias copy='cst_copy_to_clipboard'
 alias which='cst_recurse_which'
+alias resticignore='cst_add_restic_ignore'
 
 alias promt='cst_prompt'
 alias password='cst_generate_password'
@@ -437,6 +438,24 @@ cst_extract_archive() {
     *.zip) unzip "$1" ;;
     *) echo "'$1' cannot be extracted via extract()" ;;
     esac
+}
+
+# Add a .resticignore file to the current or specified directory
+cst_add_restic_ignore() {
+    local dir
+    dir="${1:-.}"
+    if [[ ! -d "$dir" ]]; then
+        echo "'$dir' is not a valid directory"
+        return 1
+    fi
+
+    {
+        echo "# restic ignore file"
+        echo "#"
+        echo "# restic excludes files and directories in this directory and its subdirectories."
+        echo "# Created by cst_add_restic_ignore, $(date)" by "$(whoami) on $(hostname)."
+    } >"$dir/.resticignore"
+    echo "Created .resticignore in '$dir'"
 }
 
 # Interactive Y/N prompt with customizable default
