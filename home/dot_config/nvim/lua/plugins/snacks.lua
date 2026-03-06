@@ -20,6 +20,7 @@ return {
   opts = function(_, opts)
     -- Set picker options
     opts = vim.tbl_deep_extend("force", opts or {}, {
+      image = { enabled = false },
       picker = {
         sources = {
           files = {

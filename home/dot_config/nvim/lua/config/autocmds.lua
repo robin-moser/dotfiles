@@ -12,6 +12,10 @@ local disable_autoformat = {
   "c",
 }
 
+local disable_autoformat_paths = {
+  "*/swarm/volumes/cms/*",
+}
+
 local disable_diagnostics = {
   "markdown",
 }
@@ -20,6 +24,15 @@ local disable_diagnostics = {
 vim.api.nvim_create_autocmd("FileType", {
   pattern = disable_autoformat,
   callback = function()
+    vim.b.autoformat = false
+  end,
+})
+
+-- Disable autoformat for specific paths
+vim.api.nvim_create_autocmd("BufRead", {
+  pattern = disable_autoformat_paths,
+  callback = function()
+    vim.notify("Autoformat disabled for " .. vim.fn.expand("%:p"), vim.log.levels.INFO, { title = "Autoformat" })
     vim.b.autoformat = false
   end,
 })

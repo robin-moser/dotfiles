@@ -80,6 +80,14 @@ end, { desc = "Go to next diagnostic message" })
 -- Shift+y yank to system clipboard
 vim.keymap.set({ "n", "v" }, "<S-y>", '"+y', opts("Yank to system clipboard"))
 
+-- Leader+y+space yank whole file to system clipboard, then go back to original position
+vim.keymap.set("n", "<leader>y<Space>", function()
+  local current_pos = vim.api.nvim_win_get_cursor(0)
+  vim.cmd("normal! ggVG")
+  vim.cmd('normal! "+y')
+  vim.api.nvim_win_set_cursor(0, current_pos)
+end, opts("Yank whole file to system clipboard"))
+
 -- Leader+p paste from system clipboard
 vim.keymap.set({ "n", "v" }, "<leader>p", '"+p', opts("Paste from system clipboard"))
 vim.keymap.set({ "n", "v" }, "<leader>P", '"+P', opts("Paste from system clipboard before cursor"))

@@ -82,7 +82,7 @@ local options = {
 
 local custom_options = {
   -- Set the path to your Python 3 interpreter
-  python3_host_prog = "/opt/homebrew/bin/python3",
+  -- python3_host_prog = "/opt/homebrew/bin/python3",
   -- Disable animations in snacks.nvim
   snacks_animate = false,
   -- Enable autoformatting on save
