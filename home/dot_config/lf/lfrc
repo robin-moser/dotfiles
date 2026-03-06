@@ -1,0 +1,60 @@
+set drawbox
+set info size
+
+set previewer "~/.config/lf/previewer"
+
+# rebind open: if its a text file, open with $EDITOR,
+# otherwise, open with the default application
+cmd open ${{
+    # get the mime type of the first file in the selection
+    mime=$(echo "$fx" | head -n1 | xargs file --mime-type -Lb)
+    case $mime in
+        text/*) echo "$fx" | tr '\n' '\0' | xargs -0 $EDITOR ;;
+        *) echo "$fx" | tr '\n' '\0' | xargs -0 open ;;
+    esac
+}}
+
+# use J and K to navigate the parent directory
+map J :updir; down; open_dir
+map K :updir; up; open_dir
+
+cmd open_dir &{{
+    if [ -d "$f" ]; then
+        lf -remote "send $id open"
+    fi
+}}
+
+# i: preview file with bat or qlmanage
+map i cst_preview
+
+cmd cst_preview ${{
+    case $(file --mime-type -Lb "$f") in
+        text/*) bat --paging always "$f" ;;
+        *)
+            qlmanage -p "$f" >/dev/null 2>&1 &
+            osascript -e 'tell application "System Events" to set frontmost of (first process whose name is "qlmanage") to true'
+            ;;
+    esac
+}}
+
+# use backspace to move files to trash
+map <backspace2> %echo "$fx" | tr '\n' '\0' | xargs -0 trash
+
+# zoxide command integration to navigate
+# to frequently used directories within lf
+cmd z %{{
+    result="$(zoxide query --exclude "$PWD" "$@" | sed 's/\\/\\\\/g;s/"/\\"/g')"
+    lf -remote "send $id cd \"$result\""
+}}
+
+cmd zi ${{
+    result="$(zoxide query -i | sed 's/\\/\\\\/g;s/"/\\"/g')"
+    lf -remote "send $id cd \"$result\""
+}}
+
+cmd on-cd &{{
+    zoxide add "$PWD"
+}}
+
+# vi: commentstring=#\ %s
+

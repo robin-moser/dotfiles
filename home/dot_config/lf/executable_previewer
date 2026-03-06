@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+
+case "$(file -Lb --mime-type -- "$1")" in
+  image/*)
+    exiftool "$1"
+    ;;
+
+  application/pdf)
+    pdfinfo "$1"
+    ;;
+
+  application/zip)
+    zipinfo "$1"
+    ;;
+
+  application/x-tar)
+    tar -tvf "$1"
+    ;;
+
+  application/gzip)
+    tar -ztvf "$1"
+    ;;
+
+  application/x-bzip2)
+    tar -jtvf "$1"
+    ;;
+
+  application/octet-stream)
+    xxd -R always -c 12 -l 164 -g 4 "$1" | head -n 20
+    ;;
+
+  # all the executable and binary files
+  application/x-mach-binary | application/x-executable)
+    file -Lb "$1"
+    echo "---"
+    fmt=$'Type: %HT | Size: %z bytes\n'
+    fmt+=$'Perms: %Sp (%p) | Owner: %Su:%Sg | Links: %l\n'
+    fmt+=$'Modified: %Sm | Created: %SB'
+    stat -Lf "$fmt" "$1"
+    echo
+    echo "Linked libraries:"
+    otool -XL "$1" | sed 's/^\t*\(.*\) (.*/\1/'
+    echo
+    xxd -R always -c 12 -l 164 -g 4 "$1" | head -n 20
+    ;;
+
+  text/* | application/*)
+    bat --color=always --style=plain --pager=never "$@"
+    ;;
+
+  *)
+    echo "Unsupported file type: $(file -Lb --mime-type -- "$1")"
+    ;;
+esac
+
+# if [ "$lf_user_hex_view" = true ]; then
+#     hexdump -C "$1"
+# else
+#     # bat "$1"
+#     bat --color=always --style=plain --pager=never "$1" "$@"
+# fi
