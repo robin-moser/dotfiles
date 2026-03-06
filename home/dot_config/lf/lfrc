@@ -30,6 +30,7 @@ map i cst_preview
 cmd cst_preview ${{
     case $(file --mime-type -Lb "$f") in
         text/*) bat --paging always "$f" ;;
+        application/vnd.sqlite3) ~/.config/lf/previewer "$f" | less -R ;;
         *)
             qlmanage -p "$f" >/dev/null 2>&1 &
             osascript -e 'tell application "System Events" to set frontmost of (first process whose name is "qlmanage") to true'

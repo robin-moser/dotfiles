@@ -29,6 +29,13 @@ case "$(file -Lb --mime-type -- "$1")" in
     xxd -R always -c 12 -l 164 -g 4 "$1" | head -n 20
     ;;
 
+  application/vnd.sqlite3)
+    echo "Tables:"
+    sqlite3 "$1" ".tables"
+    echo
+    echo "Schema:"
+    sqlite3 "$1" ".schema" | bat --color=always --style=plain --pager=never --language=sql
+    ;;
   # all the executable and binary files
   application/x-mach-binary | application/x-executable)
     file -Lb "$1"
@@ -45,6 +52,8 @@ case "$(file -Lb --mime-type -- "$1")" in
     ;;
 
   text/* | application/*)
+    file -Lb --mime-type -- "$1"
+    echo
     bat --color=always --style=plain --pager=never "$@"
     ;;
 
