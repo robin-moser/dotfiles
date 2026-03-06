@@ -48,9 +48,21 @@
 
   ### log ###
 
-  lo = log --oneline
   lp = log --patch
-  ll = log --graph --topo-order --abbrev-commit --date=short --decorate --all --boundary --pretty=format:'%Cgreen%ad %Cred%h%Creset -%C(yellow)%d%Creset %s %Cblue[%cn]%Creset %Cgreen%GS%Creset'
+
+  # show git-log with fzf preview
+  lo = "!git log --oneline | fzf --multi --preview 'git show --color=always {+1}' --preview-window down:70%:sharp"
+
+  # show graph log for current branch
+  ll = log --graph --topo-order --abbrev-commit --date=short --decorate --boundary \
+    --pretty=format:'%Cgreen%ad %Cred%h %Cblue%cn%Creset -%C(yellow)%d%Creset %s'
+
+  # show graph including signed-off-by and GPG status
+  lls = !git ll --pretty=format:'%Cgreen%ad %Cred%h %Cblue%cn%Creset -%C(yellow)%d%Creset %s %C(dim)▶︎ %GS%Creset'
+
+  # show graph for all branches
+  la = !git ll --all
+
 
   log-me = !git log --author $(git config user.email)
   log-standup = !git log --since yesterday --author $(git config user.email) --pretty=short
@@ -76,9 +88,10 @@
   rbc = rebase --continue
   rbs = rebase --skip
 
-  rbiu = rebase --interactive @{upstream}
-  rbim = rebase --interactive master
-  rbi = rebase --interactive
+  rbiu = rebase --interactive --rebase-merges @{upstream}
+  rbim = rebase --interactive --rebase-merges main
+  rbir = rebase --interactive --rebase-merges --root
+  rbi = rebase --interactive --rebase-merges
 
   ### reflog ###
 
@@ -192,6 +205,14 @@
   # root = ! pwd # this one is funny but slow
   root = rev-parse --show-toplevel
 
-  lo = "!git log --oneline | fzf --multi --preview 'git show --color=always {+1}' --preview-window down:70%:sharp"
+
+  # Show the full command for a git alias, colored and pretty-printed via bat
+  which = "!a() { \
+      git config --get-regexp "alias.${1}$" | cut -f2- -d' ' | tail -n1; \
+    }; c() { \
+      cmd=$(a $1); \
+      case "$cmd" in !*) ;; *) printf '\\033[34mgit \\033[0m';; esac; \
+      echo "$cmd" | bat --language=sh --paging=never --color=always --decorations=never; \
+    }; c"
 
 # vi: ft=gitconfig
