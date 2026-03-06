@@ -3,5 +3,6 @@
 
 .config/systemd
 .config/xremap
+.gnupg/gpg-agent.conf
 
 {{- end }}
