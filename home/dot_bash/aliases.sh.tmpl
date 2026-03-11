@@ -39,6 +39,7 @@ alias diff='colordiff -W $(( $(tput cols) -2 ))'
 alias v='cst_fuzzy_vim'
 alias vm='nvim'
 alias vim='nvim'
+alias cvim='cst_vim_chezmoi'
 
 # Development and DevOps
 alias oc='opencode'
@@ -109,6 +110,7 @@ alias path='echo -e ${PATH//:/\\n}'
 alias ncdu='gdu-go'
 alias watch='viddy'
 alias copy='cst_copy_to_clipboard'
+alias pc='cst_copy_path'
 alias which='cst_recurse_which'
 alias resticignore='cst_add_restic_ignore'
 
@@ -187,6 +189,34 @@ cst_find_file_contains() {
 # Search for text content recursively in files
 cst_find_text() {
     grep --color=always -rn . -e "$@"
+}
+
+# Copy and display the normalized current or relative given path
+cst_copy_path() {
+    # if no argument given, set ./, always end with /
+    local dir="${1:-./}/"
+
+    [ $# -eq 0 ] && ! [ -t 0 ] && IFS= read -r dir
+    [ ${dir:0:1} = / ] || dir="$PWD/$dir"
+
+    while grep -qE '/\./|//|[^/]+/\.\./' <<<"$dir"; do
+        # Remove //
+        dir="${dir//\/\//\/}"
+        # Remove /./
+        dir="${dir//\/.\//\/}"
+        # Remove /dir/../
+        dir="$(echo "$dir" | sed -E 's:/[^/]+/\.\.::')"
+    done
+    # Remove trailing /
+    dir="${dir%/}"
+
+    # Output and copy
+    echo "$dir" && printf "$dir" | copy
+}
+
+# Open chezmoi config in Neovim with snack picker
+cst_vim_chezmoi() {
+    nvim "+lua vim.schedule(function() require('chezmoi.pick').snacks() end)"
 }
 
 # Enhanced kubectl with YAML formatting via yq
