@@ -1,10 +1,12 @@
 # Brewfile
 
 tap "anomalyco/tap"
+tap "creativeprojects/tap"
 tap "deskflow/tap"
 tap "fluxcd/tap"
-tap "gromgit/fuse"
-tap "kismetwireless/kismet"
+tap "homeport/tap"
+tap "jorgelbg/tap"
+tap "macos-fuse-t/cask"
 tap "msoap/tools"
 tap "oven-sh/bun"
 tap "wpscanteam/tap"
@@ -34,10 +36,11 @@ cask "mark-text"                          # Markdown editor
 cask "mqtt-explorer"
 cask "opencode-desktop"                   # OpenCode desktop GUI
 cask "paletro"                            # Command palette in any application
-cask "quicklook-json"                     # Quick Look plugin for JSON files
+cask "qlvideo"                            # Quick Look plugin for video files
 cask "raycast"                            # Control your tools with a few keystrokes
 cask "rectangle"                          # Move and resize windows using keyboard shortcuts or snap areas
 cask "swiftbar"                           # Menu bar customization tool
+cask "thaw"                               # Free, OSS Bartender alternative
 cask "topnotch"                           # Utility to hide the notch
 cask "vienna"                             # RSS and Atom reader
 
@@ -99,17 +102,17 @@ brew "rustup"                             # Rust toolchain installer
 brew "shellcheck"                         # Static analysis and lint tool, for (ba)sh scripts
 brew "shfmt"                              # Autoformat shell script source code
 brew "typst"                              # Markup-based typesetting system
+brew "uv"                                 # Fast, minimalistic Python runtime
 brew "vim"                                # Vi 'workalike' with many additional features
 brew "yarn"                               # JavaScript package manager
 cask "vscodium"                           # Binary releases of VS Code without MS branding/telemetry/licensing
 
 # File Management & Cloud Storage
 brew "b2-tools"                           # B2 Cloud Storage Command-Line Tools
-brew "gromgit/fuse/bindfs-mac"            # FUSE filesystem for mirroring directories
 brew "rsync"                              # Utility that provides fast incremental file transfer
 cask "appcleaner"                         # Application uninstaller
 cask "betterzip"                          # Utility to create and modify archives
-cask "macfuse"                            # FUSE for macOS (required by FUSE-based filesystems)
+cask "macos-fuse-t/cask/fuse-t"           # FUSE filesystem in user space
 cask "nextcloud"                          # Desktop sync client for Nextcloud software products
 cask "synology-drive"                     # Sync and backup service to Synology NAS drives
 
@@ -148,7 +151,6 @@ brew "dhcpdump"                           # Monitor DHCP traffic for debugging p
 brew "dnsmasq"                            # Lightweight DNS forwarder and DHCP server
 brew "doggo"                              # Command-line DNS Client for Humans
 brew "iperf3"                             # Update of iperf: measures TCP, UDP, and SCTP bandwidth
-brew "kismetwireless/kismet/kismet-git"   # Kismet Wi-Fi and Wireless Sniffer
 brew "mtr"                                # 'traceroute' and 'ping' in a single tool
 brew "nmap"                               # Port scanning utility for large networks
 brew "openfortivpn"                       # Open Fortinet client for PPP+TLS VPN tunnel services
@@ -163,7 +165,7 @@ cask "mullvad-vpn"                        # Privacy-focused VPN service
 cask "wireshark-app"                      # Network protocol analyzer
 
 # Remote Access & Control
-cask "deskflow"                           # Mouse and Keyboard sharing utility
+cask "deskflow/tap/deskflow"              # Mouse and Keyboard sharing utility
 cask "rustdesk"                           # Open source virtual/remote desktop application
 cask "vnc-viewer"                         # Remote desktop application focusing on security
 
@@ -172,11 +174,13 @@ brew "bitwarden-cli"                      # Secure and free password manager for
 brew "gnupg"                              # GNU Pretty Good Privacy (PGP) package
 brew "gnutls"                             # GNU Transport Layer Security (TLS) Library
 brew "gpgme"                              # Library access to GnuPG
+brew "jorgelbg/tap/pinentry-touchid"      # Pinentry for GPG with TouchID support
 brew "pinentry-mac"                       # Pinentry for GPG on Mac
 cask "bitwarden"                          # Desktop password and login vault
 cask "blockblock"                         # Monitors common persistence locations
 cask "imhex"                              # Hex editor for reverse engineers
-cask "keepassxc"                          # Password manager app
+cask "keepassxc"                          # Keepass Password manager
+cask "keeweb"                             # Keepass compatible password manager
 cask "knockknock"                         # Tool to show what is persistently installed on the computer
 
 # System Utilities & CLI Tools
@@ -204,6 +208,7 @@ brew "homeport/tap/termshot"              # Creates screenshots from terminal ou
 brew "htop"                               # Improved top (interactive process viewer)
 brew "jc"                                 # Serializes the output of command-line tools to structured JSON output
 brew "jq"                                 # Lightweight and flexible command-line JSON processor
+brew "mas"                                # Mac App Store command-line interface
 brew "ncdu"                               # NCurses Disk Usage
 brew "procs"                              # Modern replacement for ps written in Rust
 brew "pstree"                             # Show ps output as a tree
@@ -225,3 +230,18 @@ cask "ghostty"                            # Terminal emulator that uses platform
 # Fonts
 cask "font-jetbrains-mono"
 
+# MacOS Appstore Packages
+mas "Notability",         id: 360593530   # Note-taking app with handwriting support
+mas "Peek",               id: 1554235898  # Quick-Look plugin for various file formats
+mas "Spark",              id: 1176895641  # Email client
+mas "WireGuard",          id: 1451685025  # VPN client
+mas "Keynote",            id: 361285480   # Presentation software
+mas "Numbers",            id: 361304891   # Spreadsheet software
+mas "Pages",              id: 361309726   # Word processing software
+mas "uBlock Origin Lite", id: 6745342698  # Adblocker for Safari
+
+# Other Package Managers
+uv "edir"                                 # vidir alternative to edit directories in vim
+uv "poetry"                               # Python dependency management
+
+cargo "repreg"                            # An interactive replacer for ripgrep.
