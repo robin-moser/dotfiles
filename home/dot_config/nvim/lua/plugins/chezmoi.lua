@@ -39,6 +39,9 @@ return {
   {
     "Jthaer/chezmoi.nvim",
     dir = "/Users/robin/Development/nvim/chezmoi.nvim",
+    cond = function()
+      return vim.fn.isdirectory("/Users/robin/Development/nvim/chezmoi.nvim") == 1
+    end,
     keys = {
       {
         "<leader>sz",
