@@ -75,10 +75,6 @@ TMUX_BIN="$HOME/Development/repos/tmux/tmux"
 [[ -f ~/.dircolors ]] &&
     eval "$(dircolors -b ~/.dircolors 2>/dev/null)"
 
-# init fuzzy finder
-[[ -f ~/.fzf.bash ]] &&
-    source ~/.fzf.bash
-
 # activitywatch
 [[ -n "$TMUX" && -f ~/.aw-watcher/aw-watcher-shell ]] &&
     source ~/.aw-watcher/aw-watcher-shell
@@ -96,6 +92,11 @@ export PYENV_ROOT="$HOME/.pyenv"
 # pyenv
 if command -v pyenv 1>/dev/null 2>&1; then
     eval "$(pyenv init -)"
+fi
+
+# fzf
+if command -v fzf 1>/dev/null 2>&1; then
+    eval "$(fzf --bash)"
 fi
 
 # zoxide
