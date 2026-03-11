@@ -39,6 +39,9 @@ shopt -s checkwinsize
 [[ -r "/opt/homebrew/etc/profile.d/bash_completion.sh" ]] &&
     . "/opt/homebrew/etc/profile.d/bash_completion.sh"
 
+[[ -r "/etc/profile.d/bash_completion.sh" ]] &&
+    . "/etc/profile.d/bash_completion.sh"
+
 # set history options
 shopt -s histappend
 

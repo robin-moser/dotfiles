@@ -3,6 +3,14 @@
 
 .config/systemd
 .config/xremap
-.gnupg/gpg-agent.conf
+
+{{- else }}
+# MacOS specific files, ignored on Linux
+
+.gnupg
+.aw-watcher
+.Brewfile
+config/resticprofile
 
 {{- end }}
+
