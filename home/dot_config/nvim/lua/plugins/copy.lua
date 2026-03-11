@@ -1,7 +1,7 @@
 return {
   {
     "robin-moser/nvim-copy-rtf",
-    dir = "/Users/robin/Development/repos/_Personal/nvim-copy-rtf",
+    dir = "/Users/robin/Development/nvim/nvim-copy-rtf",
     cmd = "ToRTF",
     config = function()
       vim.g.tortf_font = "Courier New"

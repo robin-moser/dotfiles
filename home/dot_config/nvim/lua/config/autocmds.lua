@@ -72,3 +72,21 @@ vim.api.nvim_create_autocmd("QuitPre", {
     end
   end,
 })
+
+-- Override <leader><space> with chezmoi picker when editing a chezmoi source file
+vim.api.nvim_create_autocmd("BufEnter", {
+  group = vim.api.nvim_create_augroup("chezmoi_pick", { clear = true }),
+
+  callback = function()
+    local bufpath = vim.api.nvim_buf_get_name(0)
+    local source_dir = vim.fn.expand("~/.local/share/chezmoi")
+    if vim.startswith(bufpath, source_dir .. "/") then
+      vim.keymap.set("n", "<leader><space>", function()
+        require("chezmoi.pick").snacks()
+      end, {
+        buffer = true,
+        desc = "Find Files (Chezmoi)",
+      })
+    end
+  end,
+})
