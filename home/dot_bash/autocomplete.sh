@@ -3,6 +3,15 @@
 # select from the history of commands in the current directory,
 # using fzf and aw-watcher-shell
 __aw_history_in_dir() {
+
+    if which aw-history-in-dir &>/dev/null; then
+        aw-history-in-dir \
+            --cwd "$PWD" \
+            --days "$AW_HISTORY_DAYS" \
+            --bucket "$AW_HISTORY_BUCKET"
+        return
+    fi
+
     python3 - "$PWD" << PYEOF
 import sys
 from aw_client import ActivityWatchClient
